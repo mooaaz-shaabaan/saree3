@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "209064067132",
+    "project_id": "saree3-6a6dc",
+    "storage_bucket": "saree3-6a6dc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209064067132:android:25412d3d869c7015f80339",
+        "android_client_info": {
+          "package_name": "com.example.saree3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8jbu5ypZO__RN9SFvbEOL9ckyTmA6nzs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
