@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 
-import '../../../../model/restaurant/restaurant_rating.dart';
+import '../../../model/restaurant/restaurant_rating.dart';
 
 Widget restaurantTile(RestaurantRating item) {
     return ListTile(

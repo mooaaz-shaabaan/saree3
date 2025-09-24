@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../constants/constants.dart';
-import '../../../../model/restaurant/restaurant_model.dart';
+import '../../../constants/constants.dart';
+import '../../../model/restaurant/restaurant_model.dart';
 
 Widget imageReasurant({required Restaurant restaurant}) {
   return Container(

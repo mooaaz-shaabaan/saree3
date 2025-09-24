@@ -152,7 +152,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   onPressed: () => signUpLogic.showPassword(),
                                   label: 'Password',
                                   controller: passwordController,
-                                  hintText: '***********',
+                                  hintText: '********',
                                   validator: (v) {
                                     if (v == null || v.isEmpty) {
                                       return "Please Enter Password";
@@ -174,12 +174,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                     .read<SignUpLogic>();
                                 return customTextFormField(
                                   password: true,
-                                  obscureText: signUpLogic.obSecure,
-                                  onPressed: () => signUpLogic.showPassword(),
+                                  obscureText: signUpLogic.reObSecure,
+                                  onPressed: () => signUpLogic.showRePassword(),
                                   label: 'Password',
                                   controller: rePasswordController,
 
-                                  hintText: '***********',
+                                  hintText: '********',
                                   validator: (v) {
                                     if (v == null || v.isEmpty) {
                                       return "Please Enter Password";
@@ -204,7 +204,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   radius: AppSizes.buttonRadius,
                                   value: signUpLogic.selectedGender,
                                   items: signUpLogic.genders,
-                                  hint: "Gender",
+                                  label: "Gender",
                                   onChanged: (val) {
                                     signUpLogic.updateGender(val);
                                   },

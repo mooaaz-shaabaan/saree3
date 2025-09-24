@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import '../../../../model/restaurant/restaurant_model.dart';
-import '../../../screens/homePage/restaurant_detail_page.dart';
+import '../../../model/restaurant/restaurant_model.dart';
+import '../../screens/homePage/restaurant_detail_page.dart';
 import 'restaurant_card.dart';
 
 

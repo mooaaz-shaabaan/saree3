@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 
-import '../../widgets/widgets/home Widgets/home_greeting.dart';
-import '../../widgets/widgets/home Widgets/home_restaurants.dart';
-import '../../widgets/widgets/home Widgets/home_search_bar.dart';
+import '../../../bussines_logic/data_user/data_user_cubit.dart';
+import '../../widgets/home Widgets/home_greeting.dart';
+import '../../widgets/home Widgets/home_restaurants.dart';
+import '../../widgets/home Widgets/home_search_bar.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    context.watch<DataUserLogic>().getData;
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => FocusScope.of(context).unfocus(),

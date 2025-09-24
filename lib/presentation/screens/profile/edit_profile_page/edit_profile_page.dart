@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:saree3/bussines_logic/data_user/data_user_cubit.dart';
 
 import '../../../../constants/constants.dart';
-import '../../../widgets/widgets/profile/customTextButton.dart';
-import '../../../widgets/widgets/profile/customTextField.dart';
+import '../../../widgets/profile/customTextButton.dart';
+import '../../../widgets/profile/customTextField.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -14,10 +16,22 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final _nameController = TextEditingController(text: 'Vishal Khadok');
-  final _emailController = TextEditingController(text: 'hello@halallab.co');
-  final _phoneController = TextEditingController(text: '408-841-0926');
-  final _bioController = TextEditingController(text: 'I love fast food');
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _bioController = TextEditingController();
+  String? _profilePhoto;
+
+  @override
+  void initState() {
+    super.initState();
+    final dataUser = context.read<DataUserLogic>();
+    _nameController.text = dataUser.fullName;
+    _emailController.text = dataUser.email;
+    _phoneController.text = dataUser.phoneNumber;
+    _bioController.text = dataUser.bio;
+    _profilePhoto = dataUser.image;
+  }
 
   @override
   void dispose() {
@@ -33,7 +47,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding:  EdgeInsets.symmetric(horizontal: 22.w, vertical: 12.h),
+          padding: EdgeInsets.symmetric(horizontal: 22.w, vertical: 12.h),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +59,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       onTap: () => Navigator.maybePop(context),
                       borderRadius: BorderRadius.circular(20.r),
                       child: Container(
-                        padding:  EdgeInsets.all(8.h),
+                        padding: EdgeInsets.all(8.h),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12.r),
@@ -60,8 +74,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         child: const Icon(Icons.arrow_back_ios_new, size: 16),
                       ),
                     ),
-                    Gap( 12.w),
-                     Text(
+                    Gap(12.w),
+                    Text(
                       'Edit Profile',
                       style: TextStyle(
                         fontSize: 18.sp,
@@ -70,7 +84,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                   ],
                 ),
-                Gap( 26.h),
+                Gap(26.h),
 
                 // avatar with edit button
                 Center(
@@ -84,16 +98,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           color: AppColors.avatarBg,
                           shape: BoxShape.circle,
                         ),
+                        child: _profilePhoto == null
+                            ? Image.asset(Images.firstImageProfile)
+                            : Image.network(_profilePhoto!),
                       ),
-                      // optional: put initials or image
-                      const Positioned(
-                        top: 44,
-                        child: Icon(
-                          Icons.person,
-                          size: 48,
-                          color: Colors.white70,
-                        ),
-                      ),
+                      // Edit Photo
                       Positioned(
                         right: 6,
                         bottom: 10,
@@ -125,10 +134,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ],
                   ),
                 ),
-                Gap( 28.h),
-
+                Gap(28.h),
                 // form fields
-                 Text(
+                Text(
                   'FULL NAME',
                   style: TextStyle(
                     fontSize: 12.sp,
@@ -136,15 +144,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     color: Colors.black54,
                   ),
                 ),
-                Gap( 8),
+                Gap(8),
                 customTextField(
                   _nameController,
                   hint: 'Full name',
                   fillColor: AppColors.fieldFill,
                 ),
 
-                Gap( 14.h),
-                 Text(
+                Gap(14.h),
+                Text(
                   'EMAIL',
                   style: TextStyle(
                     fontSize: 12.sp,
@@ -152,15 +160,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     color: Colors.black54,
                   ),
                 ),
-                Gap( 8.h),
+                Gap(8.h),
                 customTextField(
                   _emailController,
                   hint: 'Email',
                   fillColor: AppColors.fieldFill,
                 ),
 
-                Gap( 14.h),
-                 Text(
+                Gap(14.h),
+                Text(
                   'PHONE NUMBER',
                   style: TextStyle(
                     fontSize: 12.sp,
@@ -168,15 +176,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     color: Colors.black54,
                   ),
                 ),
-                Gap( 8.h),
+                Gap(8.h),
                 customTextField(
                   _phoneController,
                   hint: 'Phone number',
                   fillColor: AppColors.fieldFill,
                 ),
 
-                Gap( 14.h),
-                 Text(
+                Gap(14.h),
+                Text(
                   'BIO',
                   style: TextStyle(
                     fontSize: 12.sp,
@@ -184,7 +192,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     color: Colors.black54,
                   ),
                 ),
-                Gap( 8.h),
+                Gap(8.h),
                 customTextField(
                   _bioController,
                   hint: 'Short bio',
@@ -192,7 +200,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   maxLines: 4,
                 ),
 
-                Gap( 26.h),
+                Gap(26.h),
 
                 // Save button
                 Center(

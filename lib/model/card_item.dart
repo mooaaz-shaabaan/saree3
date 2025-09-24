@@ -5,6 +5,8 @@ class CartItem {
   final double price;
   final String imageProdact;
   final String imageResturant;
+  final String restaurantName;
+  final String restaurantNameDefault;
   int quantity;
 
   CartItem({
@@ -14,6 +16,8 @@ class CartItem {
     required this.id,
     required this.name,
     required this.price,
+    required this.restaurantName,
+    required this.restaurantNameDefault,
     required this.quantity,
   });
 

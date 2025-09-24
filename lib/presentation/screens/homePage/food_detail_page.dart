@@ -5,7 +5,6 @@ import 'package:gap/gap.dart';
 import '../../../bussines_logic/cart/cart_logic.dart';
 import '../../../bussines_logic/favorite/favorite_cubit.dart';
 import '../../../constants/constants.dart';
-import '../../../model/card_item.dart';
 import '../../../model/prodact_model.dart';
 
 class FoodDetailPage extends StatelessWidget {
@@ -402,21 +401,38 @@ void addToCart({
   required MenuItem menuItem,
   required int quantity,
 }) {
-  context.read<CartLogic>().addToCart(
-    CartItem(
-      id: menuItem.id,
-      name: menuItem.name,
-      price: menuItem.price,
-      quantity: quantity,
-      description: menuItem.description,
-      imageProdact: menuItem.imageProdact,
-      imageResturant: menuItem.imageResturant,
-    ),
-  );
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text('${menuItem.name} added to cart'),
-      duration: const Duration(seconds: 1),
-    ),
-  );
+  final result = context.read<CartLogic>().addMenuItemToCart(menuItem);
+
+  if (result == AddToCartResult.differentRestaurant) {
+    // لو المنتج من مطعم مختلف نطلع Dialog
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("تنبيه"),
+        content: Text("مش هتقدر تتطلب من أكتر من مطعم في نفس الوقت."),
+        actions: [
+          TextButton(
+            onPressed: () {
+              context.read<CartLogic>().clearCart();
+              context.read<CartLogic>().addMenuItemToCart(menuItem);
+              Navigator.pop(context);
+            },
+            child: Text("تفريغ السلة"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("إلغاء"),
+          ),
+        ],
+      ),
+    );
+  } else {
+    // لو اتضاف المنتج بنجاح
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${menuItem.name} added to cart'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
 }

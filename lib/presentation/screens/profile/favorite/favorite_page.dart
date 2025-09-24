@@ -5,7 +5,7 @@ import 'package:gap/gap.dart';
 
 import '../../../../bussines_logic/favorite/favorite_cubit.dart';
 import '../../../../constants/constants.dart';
-import '../../../widgets/widgets/restaurant doc/menu_item_card.dart';
+import '../../../widgets/restaurant doc/menu_item.dart';
 import '../../homePage/food_detail_page.dart';
 
 class FavoritePage extends StatelessWidget {

@@ -12,7 +12,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../../bussines_logic/address/address_cubit.dart';
 import '../../../../constants/constants.dart';
 import '../../../../model/address/address_model.dart';
-import '../../../widgets/widgets/profile/customTextButton.dart';
+import '../../../widgets/profile/customTextButton.dart';
 
 class AddAddressPage extends StatefulWidget {
   const AddAddressPage({super.key});
@@ -287,6 +287,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
       lat: lat!,
       lng: lng!,
       apartment: _apartmentCtrl.text,
+      id: '${context.read<AddressLogic>().addresses.length + 1}',
     );
 
     context.read<AddressLogic>().addAddress(newAddress);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../screens/profile/profile_page.dart';
+import '../../screens/profile/profile_page.dart';
 
 Widget customItemProfilePage({required List menuItems}) {
   return Column(

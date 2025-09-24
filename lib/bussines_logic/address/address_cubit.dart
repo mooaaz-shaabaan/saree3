@@ -5,10 +5,15 @@ import 'package:saree3/bussines_logic/address/address_state.dart';
 import '../../model/address/address_model.dart';
 
 class AddressLogic extends Cubit<AddressState> {
-  AddressLogic() : super(AddressInitial());
+  AddressLogic() : super(AddressInitial()) {
+    addressSelected = '${addresses[0].type} , ${addresses[0].address}';
+    addressSelectedLat = addresses[0].lat;
+    addressSelectedLng = addresses[0].lng;
+  }
 
   final List<AddressModel> addresses = [
     AddressModel(
+      id: '1',
       type: 'HOME',
       typeIndex: 0,
       address: '2464 Royal Ln. Mesa, New Jersey 45463',
@@ -19,6 +24,7 @@ class AddressLogic extends Cubit<AddressState> {
       apartment: '5',
     ),
     AddressModel(
+      id: '2',
       type: 'WORK',
       typeIndex: 1,
       address: '3891 Ranchview Dr. Richardson, California 62639',
@@ -30,6 +36,22 @@ class AddressLogic extends Cubit<AddressState> {
     ),
   ];
   int isSelected = 0;
+  String? addressSelected;
+  double? addressSelectedLat;
+  double? addressSelectedLng;
+
+  void updateAddress(String? id) {
+    if (id == null) return;
+    int index = addresses.indexWhere((address) => address.id == id);
+    if (index != -1) {
+      addressSelected =
+          '${addresses[index].type} , ${addresses[index].address}';
+      addressSelectedLat = addresses[index].lat;
+      addressSelectedLng = addresses[index].lng;
+      isSelected = index;
+      emit(AddressChanged());
+    }
+  }
 
   void updateIsSelected(int i) {
     isSelected = i;
@@ -50,5 +72,4 @@ class AddressLogic extends Cubit<AddressState> {
     addresses.removeAt(index);
     emit(AddressChanged());
   }
-  
 }

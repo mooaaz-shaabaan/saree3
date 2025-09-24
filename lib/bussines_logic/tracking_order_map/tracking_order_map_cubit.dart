@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -58,7 +59,7 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
   Future<BitmapDescriptor> _loadIcon() async {
     final icon = await BitmapDescriptor.asset(
       ImageConfiguration(size: Size(50, 50)),
-      "assets/images/motorcycle.png",
+      Images.iconDriver,
     );
     driverIcon = icon;
     emit(LoadIcon());
@@ -68,6 +69,7 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
   // دالة تجيب بيانات الرحله
   void _listenToLocations() {
     final ref = FirebaseDatabase.instance.ref("orders");
+    String userUID = FirebaseAuth.instance.currentUser!.uid;
 
     ref.onValue.listen((event) {
       if (event.snapshot.value == null) return; // ✅ لازم الأول عشان مايكسرش
@@ -79,7 +81,7 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
       data.forEach((key, value) {
         final model = DriverModel.fromMap(value);
 
-        if (model.userUID == "123abc") {
+        if (model.userUID == userUID) {
           latitudeDriver = model.lat;
           longtudeDriver = model.lng;
 

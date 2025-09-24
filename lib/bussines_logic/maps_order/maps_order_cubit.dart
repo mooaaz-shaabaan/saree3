@@ -1,6 +1,7 @@
 // import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:saree3/model/driverModel.dart';
 
@@ -21,6 +22,7 @@ class MapsOrderLogic extends Cubit<MapsOrderState> {
 
   void _listenToOrders() {
     final ref = FirebaseDatabase.instance.ref("orders");
+    String userUID = FirebaseAuth.instance.currentUser!.uid;
 
     // _subscription =
     ref.onValue.listen(
@@ -41,7 +43,7 @@ class MapsOrderLogic extends Cubit<MapsOrderState> {
 
           for (var entry in data.entries) {
             final model = DriverModel.fromMap(entry.value);
-            if (model.userUID == '123abc') {
+            if (model.userUID == userUID) {
               userOrder = model;
               break; // ✅ اخرج من الـ loop لما تلاقي المطلوب
             }

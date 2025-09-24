@@ -205,7 +205,7 @@ import '../../../../bussines_logic/address/address_cubit.dart';
 import '../../../../bussines_logic/address/address_state.dart';
 import '../../../../constants/constants.dart';
 import '../../../../model/address/address_model.dart';
-import '../../../widgets/widgets/profile/customTextButton.dart';
+import '../../../widgets/profile/customTextButton.dart';
 
 class EditAddressPage extends StatefulWidget {
   const EditAddressPage({
@@ -601,6 +601,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
     }
 
     final newAddress = AddressModel(
+      id: widget.address.id,
       type: type[isSelectedTypeAddress!],
       typeIndex: isSelectedTypeAddress!,
       address: _addressCtrl.text.trim(),

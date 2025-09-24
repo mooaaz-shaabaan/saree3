@@ -5,8 +5,12 @@ class MenuItem {
   final double price;
   final String imageProdact;
   final String imageResturant;
+  final String restaurantName;
+  final String restaurantNameDefault;
 
   MenuItem({
+    required this.restaurantName,
+    required this.restaurantNameDefault,
     required this.imageResturant,
     required this.id,
     required this.name,
@@ -23,6 +27,8 @@ class MenuItem {
       price: json['price'],
       imageProdact: json['imageProdact'],
       imageResturant: json['imageResturant'],
+      restaurantName: json['restaurantName'],
+      restaurantNameDefault: json['restaurantNameDefault'],
     );
   }
 }

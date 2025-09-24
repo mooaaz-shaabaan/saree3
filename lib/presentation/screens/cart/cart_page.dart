@@ -5,22 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:saree3/bussines_logic/address/address_cubit.dart';
+import 'package:saree3/bussines_logic/address/address_state.dart';
+import 'package:saree3/presentation/screens/profile/address/add_address.dart';
 import '../../../bussines_logic/cart/cart_logic.dart';
-import '../../../bussines_logic/user_maps/user_maps_cubit.dart';
-import '../../widgets/widgets/cart/prodacts_in_cart.dart';
+import '../../../constants/constants.dart';
+import '../../widgets/cart/customDropdownaddress.dart';
+import '../../widgets/cart/prodacts_in_cart.dart';
 
 // ignore: must_be_immutable
 class CartPage extends StatelessWidget {
   CartPage({super.key});
   String userUID = FirebaseAuth.instance.currentUser!.uid;
-  var userPosition;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CartLogic, CartState>(
       builder: (context, state) {
         CartLogic cubit = context.read<CartLogic>();
-        userPosition = context.read<UserMapsLogic>().userPosition!;
         return Scaffold(
           backgroundColor: Colors.grey[50],
 
@@ -47,7 +49,9 @@ class CartPage extends StatelessWidget {
                 padding: EdgeInsets.all(20.r),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(20.r),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
@@ -75,11 +79,15 @@ class CartPage extends StatelessWidget {
                         ),
                         GestureDetector(
                           onTap: () {
-                            // Handle edit address
-                            print('Edit address tapped');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (c) => AddAddressPage(),
+                              ),
+                            );
                           },
                           child: Text(
-                            'EDIT',
+                            'Add New Address',
                             style: TextStyle(
                               fontSize: 12.sp,
                               fontWeight: FontWeight.bold,
@@ -91,22 +99,53 @@ class CartPage extends StatelessWidget {
                       ],
                     ),
                     Gap(10.h),
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(15.h),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '2118 Thornridge Cir. Syracuse',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.grey[700],
-                        ),
-                      ),
+                    BlocBuilder<AddressLogic, AddressState>(
+                      builder: (context, state) {
+                        final addressLogic = context.read<AddressLogic>();
+
+                        // لو العناوين فاضية
+                        if (addressLogic.addresses.isEmpty) {
+                          return Center(
+                            child: const Text(
+                              "Addresses is Empty",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          );
+                        }
+
+                        // لو فيه عناوين
+                        return Column(
+                          children: [
+                            customDropdownAddresses<String>(
+                              color: AppColors.background,
+                              radius: AppSizes.buttonRadius,
+                              value: addressLogic
+                                  .addresses[addressLogic.isSelected]
+                                  .id,
+                              items: addressLogic.addresses
+                                  .map((e) => e.id)
+                                  .toList(),
+                              label: "Address",
+                              itemLabel: (id) {
+                                final a = addressLogic.addresses.firstWhere(
+                                  (a) => a.id == id,
+                                );
+                                return '${a.type} , ${a.address}';
+                              },
+                              onChanged: (val) {
+                                if (val != null) {
+                                  addressLogic.updateAddress(val);
+                                }
+                              },
+                            ),
+                            Gap(20.h),
+                          ],
+                        );
+                      },
                     ),
-                    Gap(20.h),
 
                     // Total Section
                     Row(
@@ -144,7 +183,9 @@ class CartPage extends StatelessWidget {
                       width: double.infinity,
                       height: 50.h,
                       child: ElevatedButton(
-                        onPressed: context.watch<CartLogic>().cartItems.isEmpty
+                        onPressed:
+                            context.watch<CartLogic>().cartItems.isEmpty ||
+                                context.watch<AddressLogic>().addresses.isEmpty
                             ? null
                             : () {
                                 // Handle place order
@@ -181,14 +222,19 @@ class CartPage extends StatelessWidget {
 
   Future<void> _upTpFirestore(BuildContext context) async {
     var cartItems = context.read<CartLogic>();
+    var address = context.read<AddressLogic>();
+    double total = context.read<CartLogic>().totalAmount;
     try {
       await FirebaseFirestore.instance.collection('orders').add({
         'userUID': userUID,
-        'userLat': userPosition.latitude,
-        'userLong': userPosition.longitude,
-        'location': "Cairo",
-        'restaurantName': "McDonald's",
+        'latitude': address.addressSelectedLat,
+        'longitude': address.addressSelectedLng,
+        'restaurantName': cartItems.cartItems.first.restaurantName,
+        'restaurantNameDefault':
+            cartItems.cartItems.first.restaurantNameDefault,
+        'imageResturant': cartItems.cartItems.first.imageResturant,
         'status': "pending",
+        'Total Price': total.toStringAsFixed(0),
         'cartItems': cartItems.cartItems.map((item) => item.toMap()).toList(),
         'time': DateTime.now(),
       });

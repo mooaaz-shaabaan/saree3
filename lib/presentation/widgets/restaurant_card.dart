@@ -1,8 +1,9 @@
+// widgets/restaurant_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 
-import '../../../../model/restaurant/restaurant_model.dart';
+import '../../model/restaurant/restaurant_model.dart';
 
 class RestaurantCard extends StatelessWidget {
   final Restaurant restaurant;
@@ -21,7 +22,7 @@ class RestaurantCard extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
-              blurRadius: 8.r,
+              blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
@@ -31,7 +32,6 @@ class RestaurantCard extends StatelessWidget {
           children: [
             // Restaurant Image
             _buildRestaurantImage(),
-
             // Restaurant Info
             Padding(
               padding: EdgeInsets.all(16.h),
@@ -64,7 +64,7 @@ class RestaurantCard extends StatelessWidget {
 
   Widget _buildRestaurantImage() {
     return Container(
-      height: 120,
+      height: 120.h,
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.grey[300],
@@ -75,7 +75,7 @@ class RestaurantCard extends StatelessWidget {
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(16),
               ),
-              child: Image.network(
+              child: Image.asset(
                 restaurant.imageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
@@ -96,11 +96,11 @@ class RestaurantCard extends StatelessWidget {
   Widget _buildRestaurantDetails() {
     return Row(
       children: [
-        Icon(Icons.star, size: 16.sp, color: Color(0xFF8C0700)),
+         Icon(Icons.star, size: 16.sp, color: Color(0xFF8C0700)),
         Gap(4.w),
         Text(
           restaurant.rating,
-          style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+          style:  TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
         ),
         Gap(16.w),
         Icon(
@@ -122,11 +122,11 @@ class RestaurantCard extends StatelessWidget {
           ),
         ),
         Gap(16.w),
-        Icon(Icons.access_time, size: 16.sp, color: Colors.grey),
+         Icon(Icons.access_time, size: 16.sp, color: Colors.grey),
         Gap(4.w),
         Text(
           restaurant.deliveryTime,
-          style: TextStyle(fontSize: 14.sp, color: Colors.grey),
+          style:  TextStyle(fontSize: 14, color: Colors.grey),
         ),
       ],
     );

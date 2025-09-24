@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 
-import '../../../../bussines_logic/cart/cart_logic.dart';
+import '../../../bussines_logic/cart/cart_logic.dart';
 
 Widget prodactsInCart(CartLogic cubit) {
   return ListView.builder(

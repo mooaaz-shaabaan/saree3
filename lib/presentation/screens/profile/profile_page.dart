@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:saree3/bussines_logic/auth/auth_logic.dart';
 
-import '../../widgets/widgets/profile/customItemsProfilePage.dart';
+import '../../widgets/profile/customItemsProfilePage.dart';
 import '../cart/cart_page.dart';
 import 'address/address_page.dart';
 import 'edit_profile_page/edit_profile_page.dart';

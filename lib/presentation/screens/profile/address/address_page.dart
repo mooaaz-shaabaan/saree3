@@ -6,7 +6,7 @@ import 'package:saree3/presentation/screens/profile/address/add_address.dart';
 import '../../../../bussines_logic/address/address_cubit.dart';
 import '../../../../bussines_logic/address/address_state.dart';
 import '../../../../constants/constants.dart';
-import '../../../widgets/widgets/profile/customTextButton.dart';
+import '../../../widgets/profile/customTextButton.dart';
 import 'edit_address.dart';
 
 class MyAddressPage extends StatelessWidget {
@@ -55,7 +55,19 @@ class MyAddressPage extends StatelessWidget {
               ),
               Gap(24.h),
               // List
-              viewAddress(),
+              context.watch<AddressLogic>().addresses.isEmpty
+                  ? Expanded(
+                      child: Center(
+                        child: Text(
+                          'Your cart is empty',
+                          style: TextStyle(
+                            color: Colors.grey[500],
+                            fontSize: 16.sp,
+                          ),
+                        ),
+                      ),
+                    )
+                  : viewAddress(),
               // Add button
               addNewAddress(context),
               Gap(2.h),

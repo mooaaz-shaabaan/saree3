@@ -6,6 +6,7 @@ import 'package:saree3/bussines_logic/user_maps/user_maps_cubit.dart';
 
 import '../bussines_logic/address/address_cubit.dart';
 import '../bussines_logic/cart/cart_logic.dart';
+import '../bussines_logic/data_user/data_user_cubit.dart';
 import '../bussines_logic/favorite/favorite_cubit.dart';
 import '../bussines_logic/login/login_cubit.dart';
 import '../bussines_logic/signUp/signup_cubit.dart';
@@ -20,6 +21,13 @@ class AppProviders {
     BlocProvider<SignUpLogic>(create: (_) => SignUpLogic()),
     BlocProvider<VerifyLogic>(create: (_) => VerifyLogic()),
     BlocProvider<AuthLogic>(create: (_) => AuthLogic()),
+    BlocProvider<DataUserLogic>(
+      create: (_) {
+        final cubit = DataUserLogic();
+        cubit.initialize();
+        return cubit;
+      },
+    ),
     BlocProvider<MapsOrderLogic>(
       create: (_) {
         final cubit = MapsOrderLogic();

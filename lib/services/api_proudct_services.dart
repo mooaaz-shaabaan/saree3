@@ -6,7 +6,7 @@ import 'package:saree3/model/prodact_model.dart';
 class ApiServices {
   Future<List<MenuItem>> prodacts({required String resturantName}) async {
     final url = Uri.parse(
-      "https://mooaaz-shaabaan.github.io/saree3/$resturantName",
+      "https://mooaaz-shaabaan.github.io/saree3_API/$resturantName",
     );
     final result = await http.get(url);
     List<dynamic> data = jsonDecode(result.body);

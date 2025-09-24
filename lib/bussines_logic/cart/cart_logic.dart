@@ -1,7 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../model/card_item.dart';
+import '../../model/prodact_model.dart';
 part 'cart_state.dart';
+
+enum AddToCartResult { added, increasedQuantity, differentRestaurant }
 
 class CartLogic extends Cubit<CartState> {
   CartLogic() : super(CartInitial());
@@ -20,18 +23,50 @@ class CartLogic extends Cubit<CartState> {
     emit(CartUpdated(cartItems)); // علشان الـ UI يتحدث
   }
 
-  void addToCart(CartItem cartItem) {
-    final index = cartItems.indexWhere((item) => item.name == cartItem.name);
+  AddToCartResult addMenuItemToCart(MenuItem menuItem) {
+    final cartItem = CartItem(
+      id: menuItem.id,
+      name: menuItem.name,
+      price: menuItem.price,
+      quantity: 1,
+      description: menuItem.description,
+      imageProdact: menuItem.imageProdact,
+      imageResturant: menuItem.imageResturant,
+      restaurantName: menuItem.restaurantName,
+      restaurantNameDefault: menuItem.restaurantNameDefault,
+    );
 
-    if (index != -1) {
-      // المنتج موجود → نزود الكمية
-      cartItems[index].quantity += cartItem.quantity;
-    } else {
-      // المنتج جديد → نضيفه
+    // ✅ لو السلة فاضية → ضيفه على طول
+    if (cartItems.isEmpty) {
       cartItems.add(cartItem);
+      emit(CartSuccess());
+      return AddToCartResult.added;
     }
 
-    emit(CartSuccess());
+    // ✅ نجيب المطعم الأول الموجود في السلة
+    final currentRestaurant = cartItems.first.imageResturant;
+
+    // ❌ لو المنتج من مطعم مختلف → نرجع أنه مختلف
+    if (cartItem.imageResturant != currentRestaurant) {
+      return AddToCartResult.differentRestaurant;
+    }
+
+    // ✅ لو المنتج من نفس المطعم
+    final sameItemIndex = cartItems.indexWhere(
+      (item) => item.id == cartItem.id,
+    );
+
+    if (sameItemIndex != -1) {
+      // نفس المنتج موجود → نزود الكمية
+      cartItems[sameItemIndex].quantity += cartItem.quantity;
+      emit(CartSuccess());
+      return AddToCartResult.increasedQuantity;
+    } else {
+      // منتج جديد من نفس المطعم → نضيفه
+      cartItems.add(cartItem);
+      emit(CartSuccess());
+      return AddToCartResult.added;
+    }
   }
 
   void removeItem(int id) {

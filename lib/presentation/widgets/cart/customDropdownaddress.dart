@@ -1,8 +1,10 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 
-Widget customDropdown<T>({
+Widget customDropdownAddresses<T>({
   required T? value,
   required List<T> items,
   required String label,
@@ -10,6 +12,7 @@ Widget customDropdown<T>({
   required Color color,
   required double radius,
   String? Function(T?)? validator,
+  required String Function(T) itemLabel, // هنا بنحدد النص اللي هيتعرض
 }) => Column(
   children: [
     Align(alignment: Alignment.centerLeft, child: Text(label.toUpperCase())),
@@ -24,7 +27,7 @@ Widget customDropdown<T>({
           color: Colors.black54,
         ),
         filled: true,
-        fillColor: color, // same as LoginTextField / PasswordTextField
+        fillColor: color,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
           borderSide: BorderSide.none,
@@ -35,7 +38,7 @@ Widget customDropdown<T>({
         return DropdownMenuItem<T>(
           value: item,
           child: Text(
-            item.toString(),
+            itemLabel(item), // هنا بنستخدم الفنكشن
             style: TextStyle(fontSize: 16.sp, color: Colors.black87),
           ),
         );

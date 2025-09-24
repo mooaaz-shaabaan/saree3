@@ -103,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                                 onPressed: () => loginLogic.showPassword(),
                                 label: 'Password',
                                 controller: passwordController,
-                                hintText: '***********',
+                                hintText: '********',
                                 validator: (v) {
                                   if (v == null || v.isEmpty) {
                                     return "Please Enter Password";

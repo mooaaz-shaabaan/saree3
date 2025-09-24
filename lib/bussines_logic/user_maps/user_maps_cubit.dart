@@ -67,7 +67,7 @@ class UserMapsLogic extends Cubit<UserMapsStatee> {
   Future<BitmapDescriptor> _loadIcon() async {
     final icon = await BitmapDescriptor.asset(
       ImageConfiguration(size: Size(50, 50)),
-      "assets/images/motorcycle.png",
+      Images.iconDriver,
     );
     driverIcon = icon;
     emit(LoadIcon());

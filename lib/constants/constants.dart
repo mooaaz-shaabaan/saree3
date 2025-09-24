@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Images {
   static const String backgroundImage = "assets/images/background.png";
+  static const String iconDriver = "assets/images/motorcycle.png";
   static const String firstImageProfile =
       "https://firebasestorage.googleapis.com/v0/b/saree3-6a6dc.firebasestorage.app/o/user_avatar.png?alt=media&token=e62dce0d-990e-4be8-a5be-c49268e8eac1";
 }

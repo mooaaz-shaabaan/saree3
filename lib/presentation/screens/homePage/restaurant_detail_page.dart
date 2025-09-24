@@ -5,10 +5,10 @@ import 'package:saree3/services/api_proudct_services.dart';
 import '../../../constants/constants.dart';
 import '../../../model/prodact_model.dart';
 import '../../../model/restaurant/restaurant_model.dart';
-import '../../widgets/widgets/restaurant doc/header.dart';
-import '../../widgets/widgets/restaurant doc/image.dart';
-import '../../widgets/widgets/restaurant doc/menu_item_grid.dart';
-import '../../widgets/widgets/restaurant doc/restaurant_doc.dart';
+import '../../widgets/restaurant doc/header.dart';
+import '../../widgets/restaurant doc/image.dart';
+import '../../widgets/restaurant doc/menu_item.dart';
+import '../../widgets/restaurant doc/restaurant_doc.dart';
 
 class RestaurantDetailPage extends StatelessWidget {
   const RestaurantDetailPage({super.key, required this.restaurant});

@@ -23,7 +23,9 @@ Future<void> signUp({
         .set({
           'uid': userCred.user!.uid,
           'email': email,
-          'name': name,
+          'full_name': name,
+          'phone_number': "16757",
+          'bio': "I love fast food",
           'image': image,
           'createdAt': FieldValue.serverTimestamp(),
         });
@@ -32,7 +34,7 @@ Future<void> signUp({
       context: context,
       dialogType: DialogType.success,
       animType: AnimType.bottomSlide,
-      title: "تم تسجيل الحساب بنجاج",
+      title: "Account registered successfully",
     ).show();
 
     await Future.delayed(const Duration(seconds: 2));
@@ -44,7 +46,7 @@ Future<void> signUp({
       );
     }
   } on FirebaseAuthException catch (e) {
-    String message = "حصل خطأ، حاول تاني";
+    String message = "Error, Please try again";
     switch (e.code) {
       case 'email-already-in-use':
         message = "This email is already in use.";
@@ -94,25 +96,16 @@ Future<void> login({
   required BuildContext context,
 }) async {
   try {
-    UserCredential userCred = await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password);
-
-    String uid = userCred.user!.uid;
-
-    DocumentSnapshot snap = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .get();
-
-    if (!snap.exists || !snap.data().toString().contains('role')) {
-      throw Exception("اليوزر مالوش role");
-    }
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
 
     AwesomeDialog(
       context: context,
       dialogType: DialogType.success,
       animType: AnimType.bottomSlide,
-      title: "تم تسجيل الدخول الى حسابك بنجاح",
+      title: "Successfully login your account.",
     ).show();
 
     await Future.delayed(const Duration(seconds: 2));
