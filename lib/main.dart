@@ -59,6 +59,11 @@ class MyApp extends StatelessWidget {
   flutter run --release
 */
 
+/*
+git add .
+git commit -m "tkmla elProject" 
+git push origin main
+*/
 
 /*
   final currentUser = FirebaseAuth.instance.currentUser;
