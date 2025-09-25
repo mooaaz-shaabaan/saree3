@@ -88,7 +88,7 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
           driverMarkers.add(
             Marker(
               markerId: MarkerId(model.userUID),
-              position: LatLng(model.lat, model.lng),
+              position: LatLng(latitudeDriver!, longtudeDriver!),
               icon: driverIcon!,
               // infoWindow: InfoWindow(title: model.driver_name),
             ),

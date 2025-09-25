@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:saree3/bussines_logic/auth/auth_logic.dart';
 
+import '../../../bussines_logic/data_user/data_user_cubit.dart';
+import '../../../constants/constants.dart';
 import '../../widgets/profile/customItemsProfilePage.dart';
 import '../cart/cart_page.dart';
 import 'address/address_page.dart';
@@ -105,47 +107,42 @@ class ProfilePage extends StatelessWidget {
               // Profile Header
               Container(
                 padding: EdgeInsets.symmetric(vertical: 20.h),
-                child: Column(
-                  children: [
-                    // Profile Picture
-                    Container(
-                      height: 80.h,
-                      width: 80.w,
-                      decoration: BoxDecoration(
-                        color: Color(0xFFFFF3CD),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          'VK',
+                child: BlocBuilder<DataUserLogic, DataUserState>(
+                  builder: (context, state) {
+                    final data = context.watch<DataUserLogic>();
+                    return Column(
+                      children: [
+                        // Profile Picture
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundColor: AppColors.primary,
+                          backgroundImage: NetworkImage(data.image),
+                          // child: CircularProgressIndicator(
+                          //   color: AppColors.primary,
+                          // ),
+                        ),
+                        Gap(15.h),
+                        // Name
+                        Text(
+                          data.fullName,
                           style: TextStyle(
-                            fontSize: 24.sp,
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
-                            color: Colors.orange[800],
+                            color: Colors.black87,
                           ),
                         ),
-                      ),
-                    ),
-                    Gap(15.h),
-                    // Name
-                    Text(
-                      'Vishal Khadok',
-                      style: TextStyle(
-                        fontSize: 20.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    Gap(5.h),
-                    // Subtitle
-                    Text(
-                      'I love fast food',
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
+                        Gap(5.h),
+                        // Subtitle
+                        Text(
+                          data.bio,
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
               Gap(20.h),

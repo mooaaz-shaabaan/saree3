@@ -1,197 +1,4 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:gap/gap.dart';
-
-// import '../../../../bussines_logic/address/address_cubit.dart';
-// import '../../../../bussines_logic/address/address_state.dart';
-// import '../../../../constants/constants.dart';
-// import '../../../../model/address/address_model.dart';
-// import '../../../widgets/widgets/profile/customTextButton.dart';
-
-// class EditAddressPage extends StatefulWidget {
-//   const EditAddressPage({
-//     super.key,
-//     required this.address,
-//     required this.index,
-//   });
-//   final AddressModel address;
-//   final int index;
-
-//   @override
-//   State<EditAddressPage> createState() => _EditAddressPageState();
-// }
-
-// class _EditAddressPageState extends State<EditAddressPage> {
-//   late TextEditingController addressCtrl;
-//   int? isSelected;
-//   List<String> type = ["HOME", "WORK", "OTHER"];
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     addressCtrl = TextEditingController(text: widget.address.address);
-//     isSelected = widget.address.typeIndex;
-
-//     final addressLogic = context.read<AddressLogic>();
-//     addressLogic.isSelected = isSelected!;
-//   }
-
-//   @override
-//   void dispose() {
-//     addressCtrl.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Edit Address'),
-//         backgroundColor: Colors.white,
-//         elevation: 0,
-//         foregroundColor: Colors.black,
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(22),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             const Text(
-//               'TYPE',
-//               style: TextStyle(
-//                 fontWeight: FontWeight.w600,
-//                 color: Colors.black54,
-//               ),
-//             ),
-//             // h
-//             Gap(8.h),
-//             BlocBuilder<AddressLogic, AddressState>(
-//               builder: (context, state) {
-//                 AddressLogic addressLogic = context.read<AddressLogic>();
-
-//                 return Row(
-//                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                   children: List.generate(type.length, (i) {
-//                     return MaterialButton(
-//                       onPressed: () {
-//                         addressLogic.updateIsSelected(i);
-//                         isSelected = i;
-//                       },
-//                       color: addressLogic.isSelected == i
-//                           ? AppColors.primary
-//                           : AppColors.white,
-//                       child: Text(
-//                         type[i],
-//                         style: TextStyle(
-//                           color: addressLogic.isSelected == i
-//                               ? AppColors.white
-//                               : AppColors.black,
-//                         ),
-//                       ),
-//                     );
-//                   }),
-//                 );
-//               },
-//             ),
-//             // h
-//             Gap(16.h),
-
-//             const Text(
-//               'ADDRESS',
-//               style: TextStyle(
-//                 fontWeight: FontWeight.w600,
-//                 color: Colors.black54,
-//               ),
-//             ),
-//             // h
-//             Gap(8.h),
-//             TextField(
-//               controller: addressCtrl,
-//               maxLines: 3,
-//               decoration: InputDecoration(
-//                 hintText: 'Enter address',
-//                 filled: true,
-//                 fillColor: const Color(0xFFF0F7FB),
-//                 border: OutlineInputBorder(
-//                   borderSide: BorderSide.none,
-//                   borderRadius: BorderRadius.circular(12),
-//                 ),
-//               ),
-//             ),
-//             const Spacer(),
-
-//             // Save button
-//             SizedBox(
-//               width: double.infinity,
-//               height: 52.h,
-//               child: ElevatedButton(
-//                 style: ElevatedButton.styleFrom(
-//                   backgroundColor: AppColors.primary,
-//                   shape: RoundedRectangleBorder(
-//                     borderRadius: BorderRadius.circular(14),
-//                   ),
-//                   elevation: 6,
-//                 ),
-//                 onPressed: () {
-//                   editAddress();
-//                 },
-//                 child: customTextButton(text: 'SAVE'),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   void editAddress() {
-//     if (widget.address.type.isEmpty || addressCtrl.text.trim().isEmpty) {
-//       ScaffoldMessenger.of(
-//         context,
-//       ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
-//       return;
-//     }
-
-//     final newAddress = AddressModel(
-//       type: type[isSelected!],
-//       typeIndex: isSelected!,
-//       address: addressCtrl.text.trim(),
-//       icon: setIcon(text: type[isSelected!]),
-//       color: setColor(text: type[isSelected!]),
-//       lat: 0,
-//       lng: 0,
-//       apartment: widget.address.apartment,
-//     );
-
-//     context.read<AddressLogic>().editAddress(widget.index, newAddress);
-
-//     Navigator.pop(context);
-//   }
-
-//   IconData setIcon({required String text}) {
-//     IconData icon = Icons.location_on;
-//     if (text == "WORK") {
-//       icon = Icons.work_outline;
-//     } else if (text == "HOME") {
-//       icon = Icons.home_outlined;
-//     }
-//     return icon;
-//   }
-
-//   Color setColor({required String text}) {
-//     Color icon = AppColors.green;
-//     if (text == "WORK") {
-//       icon = AppColors.purple;
-//     } else if (text == "HOME") {
-//       icon = AppColors.blue;
-//     }
-//     return icon;
-//   }
-// }
-
 import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -229,7 +36,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
   Position? _userPosition;
   StreamSubscription<Position>? _positionStream;
   bool _movedOnce = false; // 👈 عشان الكاميرا تتحرك أول مرة بس
-  LatLng _center = const LatLng(30.0444, 31.2357); // القاهرة مثلًا
+  LatLng? _center;
   String _address = "Drag the map to get the address";
   String? userUID;
   int _firstAddress = 0;
@@ -249,8 +56,8 @@ class _EditAddressPageState extends State<EditAddressPage> {
     userUID = FirebaseAuth.instance.currentUser!.uid;
     _addressCtrl.text = widget.address.address;
     _apartmentCtrl.text = widget.address.apartment;
-
     isSelectedTypeAddress = widget.address.typeIndex;
+    _center = LatLng(widget.address.lat, widget.address.lng);
     super.initState();
   }
 
@@ -264,9 +71,6 @@ class _EditAddressPageState extends State<EditAddressPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("////////////🤕🤕🤕🤕////////////////// $isSelectedTypeAddress");
-    print("/////////////🤕🤕🤕🤕///////////// ${widget.address.typeIndex}");
-
     return Scaffold(
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -440,7 +244,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
           initialCameraPosition: CameraPosition(
             target: _userPosition != null
                 ? LatLng(_userPosition!.latitude, _userPosition!.longitude)
-                : const LatLng(30.05, 31.31),
+                : (LatLng(widget.address.lat, widget.address.lng)),
             zoom: 17.5,
           ),
           onMapCreated: (GoogleMapController controller) {
@@ -451,7 +255,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
           },
           onCameraMoveStarted: () => setState(() => _showForm = false),
           onCameraIdle: () {
-            _getAddressFromLatLng(_center);
+            _getAddressFromLatLng(_center!);
             setState(() => _showForm = true);
           },
           onCameraMove: (position) => _center = position.target,

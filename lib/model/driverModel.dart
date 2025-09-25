@@ -1,12 +1,14 @@
 class DriverModel {
-  // final String driverUID, driver_name, userUID;
-  String userUID = '';
+  String driverName, driverPhone, userUID, statusOrder;
   double lat = 0, lng = 0;
+  Map cartItems;
 
   DriverModel({
+    required this.statusOrder,
+    required this.cartItems,
+    required this.driverPhone,
     required this.userUID,
-    // required this.driver_name,
-    // required this.driverUID,
+    required this.driverName,
     required this.lat,
     required this.lng,
   });
@@ -14,11 +16,12 @@ class DriverModel {
   factory DriverModel.fromMap(Map<dynamic, dynamic> map) {
     return DriverModel(
       userUID: map['userUID'] ?? "",
-      // driverUID: map['driverUID'],
-      lat: map['lat'] ?? 0,
-      lng: map['lng'] ?? 0,
-      // driver_name: map['driver_name'],
+      lat: map['driver_lat'] ?? 0,
+      lng: map['driver_long'] ?? 0,
+      driverName: map['driverName'],
+      driverPhone: map['phone'],
+      cartItems: map['cartItems'],
+      statusOrder: 'status',
     );
   }
 }
-

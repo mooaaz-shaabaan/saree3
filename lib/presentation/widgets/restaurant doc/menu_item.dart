@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -52,16 +53,7 @@ Widget menuItemCard({
   required int index,
 }) {
   return GestureDetector(
-    onTap: () {
-      // Navigate to food detail page
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              FoodDetailPage(menuItem: menuItem, index: index),
-        ),
-      );
-    },
+    onTap: onTap,
     child: Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -150,7 +142,7 @@ Widget menuItemCard({
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        '\$${menuItem.price.toInt()}',
+                        '${menuItem.price.toInt()} EGP',
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
@@ -165,31 +157,50 @@ Widget menuItemCard({
 
                           if (result == AddToCartResult.differentRestaurant) {
                             // لو المنتج من مطعم مختلف نطلع Dialog
-                            showDialog(
+                            AwesomeDialog(
                               context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text("تنبيه"),
-                                content: Text(
-                                  "مش هتقدر تتطلب من أكتر من مطعم في نفس الوقت.",
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      context.read<CartLogic>().clearCart();
-                                      context
-                                          .read<CartLogic>()
-                                          .addMenuItemToCart(menuItem);
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text("تفريغ السلة"),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text("إلغاء"),
-                                  ),
-                                ],
-                              ),
-                            );
+                              dialogType: DialogType.warning,
+                              animType: AnimType.bottomSlide,
+                              title:
+                                  "You can't order from more than one restaurant at the same time.",
+                              btnCancelOnPress: () {
+                                Navigator.pop(context);
+                              },
+                              btnCancelText: "Cancel",
+                              btnOkOnPress: () {
+                                context.read<CartLogic>().clearCart();
+                                context.read<CartLogic>().addMenuItemToCart(
+                                  menuItem,
+                                );
+                              },
+                              btnOkText: "Clear Cart",
+                            ).show();
+
+                            // showDialog(
+                            //   context: context,
+                            //   builder: (context) => AlertDialog(
+                            //     title: Text("تنبيه"),
+                            //     content: Text(
+                            //       "مش هتقدر تتطلب من أكتر من مطعم في نفس الوقت.",
+                            //     ),
+                            //     actions: [
+                            //       TextButton(
+                            //         onPressed: () {
+                            //           context.read<CartLogic>().clearCart();
+                            //           context
+                            //               .read<CartLogic>()
+                            //               .addMenuItemToCart(menuItem);
+                            //           Navigator.pop(context);
+                            //         },
+                            //         child: Text("تفريغ السلة"),
+                            //       ),
+                            //       TextButton(
+                            //         onPressed: () => Navigator.pop(context),
+                            //         child: Text("إلغاء"),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // );
                           } else {
                             // لو اتضاف المنتج بنجاح
                             ScaffoldMessenger.of(context).showSnackBar(

@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:saree3/constants/constants.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 part 'data_user_state.dart';
 
@@ -24,7 +28,7 @@ class DataUserLogic extends Cubit<DataUserState> {
   void getData() async {
     try {
       final userDoc = await FirebaseFirestore.instance
-          .collection('userAccount') // خليها موحدة زي ما اتفقنا
+          .collection('User Account') // خليها موحدة زي ما اتفقنا
           .doc(userUID)
           .get();
 
@@ -42,6 +46,54 @@ class DataUserLogic extends Cubit<DataUserState> {
     }
   }
 
+  Future<String> _uploadProfilePhoto(XFile imageFile) async {
+    try {
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child("profile_photos")
+          .child("$userUID.jpg");
+
+      await ref.putFile(File(imageFile.path));
+      final downloadUrl = await ref.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      print("Error uploading image: $e");
+      return "";
+    }
+  }
+
+  /// 🔹 اختيار صورة + رفعها + تخزين الرابط في Firestore
+  Future<void> uploadAndSaveProfilePhoto() async {
+    try {
+      final picker = ImagePicker();
+      final profilePhoto = await picker.pickImage(source: ImageSource.gallery);
+
+      if (profilePhoto != null) {
+        // ارفع الصورة على Storage
+        final downloadUrl = await _uploadProfilePhoto(profilePhoto);
+
+        if (downloadUrl.isNotEmpty) {
+          // خزن في Firestore
+          await FirebaseFirestore.instance
+              .collection('User Account')
+              .doc(userUID)
+              .set({
+                'image': downloadUrl,
+                'fullName': fullName,
+                'email': email,
+                'phoneNumber': phoneNumber,
+                'bio': bio,
+              }, SetOptions(merge: true));
+
+          image = downloadUrl; // حدّث القيمة المحلية
+          emit(SetData());
+        }
+      }
+    } catch (e) {
+      print("Error in uploadAndSaveProfilePhoto: $e");
+    }
+  }
+
   void setData({
     required String newEmail,
     required String newFullName,
@@ -49,13 +101,22 @@ class DataUserLogic extends Cubit<DataUserState> {
     required String newBio,
     required String newImage,
   }) async {
-    await FirebaseFirestore.instance.collection('users').doc(userUID).set({
-      'email': newEmail,
-      'full_name': newFullName,
-      'phone_number': newPhoneNumber,
-      'bio': newBio,
-      'image': newImage,
-    });
+    await FirebaseFirestore.instance
+        .collection('User Account')
+        .doc(userUID)
+        .set({
+          'image': newImage,
+          'fullName': newFullName,
+          'email': newEmail,
+          'phoneNumber': newPhoneNumber,
+          'bio': newBio,
+        }, SetOptions(merge: true));
+
+    image = newImage;
+    fullName = newFullName;
+    email = newEmail;
+    phoneNumber = newPhoneNumber;
+    bio = newBio;
     emit(SetData());
   }
 }

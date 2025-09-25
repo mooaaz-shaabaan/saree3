@@ -387,6 +387,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
             _movedOnce = true;
           }
         });
+    _moveToUserPosition();
   }
 
   // دالة تحرك الكاميرا على مكان اليوزر
@@ -403,5 +404,4 @@ class _AddAddressPageState extends State<AddAddressPage> {
     );
   }
 
-  // دالة لـ ستايل الماب
 }

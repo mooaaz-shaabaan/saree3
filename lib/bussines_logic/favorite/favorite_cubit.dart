@@ -8,24 +8,7 @@ class FavoriteLogic extends Cubit<FavoriteState> {
   FavoriteLogic() : super(FavoriteInitial());
 
   List<MenuItem> favorites = [];
-  Map<int, int> quantityPerItem = {};
 
-  int getQuantity(MenuItem item) {
-    return quantityPerItem[item.id] ?? 1;
-  }
-
-  void plusQuantity(MenuItem item) {
-    quantityPerItem[item.id] = getQuantity(item) + 1;
-    emit(FavoriteSuccess());
-  }
-
-  void minsQuantity(MenuItem item) {
-    final current = getQuantity(item);
-    if (current > 1) {
-      quantityPerItem[item.id] = current - 1;
-      emit(FavoriteSuccess());
-    }
-  }
 
   bool isFavoriteItem(MenuItem item) {
     return favorites.any((element) => element.id == item.id);

@@ -11,6 +11,25 @@ class CartLogic extends Cubit<CartState> {
 
   List<CartItem> cartItems = [];
 
+  Map<int, int> quantityPerItem = {};
+
+  int getQuantity(MenuItem item) {
+    return quantityPerItem[item.id] ?? 1;
+  }
+
+  void plusQuantity(MenuItem item) {
+    quantityPerItem[item.id] = getQuantity(item) + 1;
+    emit(CartUpdated(cartItems));
+  }
+
+  void minsQuantity(MenuItem item) {
+    final current = getQuantity(item);
+    if (current > 1) {
+      quantityPerItem[item.id] = current - 1;
+      emit(CartUpdated(cartItems));
+    }
+  }
+
   double get totalAmount {
     return cartItems.fold(
       0.0,

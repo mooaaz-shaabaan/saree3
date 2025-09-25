@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,7 +24,7 @@ class FoodDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Cart = context.read<FavoriteLogic>();
+    final Cart = context.read<CartLogic>();
     final int quantity = Cart.getQuantity(menuItem);
     final double currentPrice = menuItem.price * quantity;
 
@@ -268,7 +269,7 @@ class FoodDetailPage extends StatelessWidget {
                         children: [
                           // Price
                           Text(
-                            '\$${currentPrice.toInt()}',
+                            '${currentPrice.toInt()} EGP',
                             style: const TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -279,9 +280,9 @@ class FoodDetailPage extends StatelessWidget {
                           const Spacer(),
 
                           // Quantity selector
-                          BlocBuilder<FavoriteLogic, FavoriteState>(
+                          BlocBuilder<CartLogic, CartState>(
                             builder: (context, state) {
-                              final plusMins = context.read<FavoriteLogic>();
+                              final plusMins = context.read<CartLogic>();
                               return Container(
                                 decoration: BoxDecoration(
                                   color: Colors.black87,
@@ -308,8 +309,8 @@ class FoodDetailPage extends StatelessWidget {
                                       ),
                                     ),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 16.h,
                                       ),
                                       child: Text(
                                         plusMins
@@ -350,9 +351,9 @@ class FoodDetailPage extends StatelessWidget {
                       Gap(20.h),
 
                       // Add to cart button
-                      BlocBuilder<FavoriteLogic, FavoriteState>(
+                      BlocBuilder<CartLogic, CartState>(
                         builder: (context, state) {
-                          final plusMins = context.read<FavoriteLogic>();
+                          final getQuantity = context.read<CartLogic>();
                           return SizedBox(
                             width: double.infinity,
                             height: 50,
@@ -361,7 +362,7 @@ class FoodDetailPage extends StatelessWidget {
                                 addToCart(
                                   context: context,
                                   menuItem: menuItem,
-                                  quantity: plusMins.getQuantity(menuItem),
+                                  quantity: getQuantity.getQuantity(menuItem),
                                 );
                                 Navigator.pop(context);
                               },
@@ -401,38 +402,45 @@ void addToCart({
   required MenuItem menuItem,
   required int quantity,
 }) {
-  final result = context.read<CartLogic>().addMenuItemToCart(menuItem);
+  try {
+    final result = context.read<CartLogic>().addMenuItemToCart(menuItem);
 
-  if (result == AddToCartResult.differentRestaurant) {
-    // لو المنتج من مطعم مختلف نطلع Dialog
-    showDialog(
+    if (result == AddToCartResult.differentRestaurant) {
+      // لو المنتج من مطعم مختلف نطلع Dialog
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.warning,
+        animType: AnimType.bottomSlide,
+        title:
+            "You can't order from more than one restaurant at the same time.",
+        btnCancelOnPress: () {
+          Navigator.pop(context);
+        },
+        btnCancelText: "Cancel",
+        btnOkOnPress: () {
+          context.read<CartLogic>().clearCart();
+          context.read<CartLogic>().addMenuItemToCart(menuItem);
+        },
+        btnOkText: "Clear Cart",
+      ).show();
+    } else {
+      // لو اتضاف المنتج بنجاح
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${menuItem.name} added to cart'),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    }
+  } catch (e) {
+    print(
+      "/////////////////////////////////////////////////////////////////////////////$e",
+    );
+    AwesomeDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text("تنبيه"),
-        content: Text("مش هتقدر تتطلب من أكتر من مطعم في نفس الوقت."),
-        actions: [
-          TextButton(
-            onPressed: () {
-              context.read<CartLogic>().clearCart();
-              context.read<CartLogic>().addMenuItemToCart(menuItem);
-              Navigator.pop(context);
-            },
-            child: Text("تفريغ السلة"),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("إلغاء"),
-          ),
-        ],
-      ),
-    );
-  } else {
-    // لو اتضاف المنتج بنجاح
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${menuItem.name} added to cart'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
+      dialogType: DialogType.warning,
+      animType: AnimType.bottomSlide,
+      title: "$e",
+    ).show();
   }
 }

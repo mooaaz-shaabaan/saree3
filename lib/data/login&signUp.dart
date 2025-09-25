@@ -160,7 +160,7 @@ Future<void> login({
       title: message,
     ).show();
   } catch (e) {
-    print("حدث خطأ غير متوقع => $e");
+    print("ERROR => $e");
   }
 }
 
