@@ -20,7 +20,7 @@ class FormatMinutes extends TrackingOrderMapState {}
 
 class FitCameraToBounds extends TrackingOrderMapState {}
 
-class ErrorState extends TrackingOrderMapState {
+class ErrrorState extends TrackingOrderMapState {
   final String message;
-  ErrorState(this.message);
+  ErrrorState(this.message);
 }

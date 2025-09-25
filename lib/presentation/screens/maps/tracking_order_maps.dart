@@ -20,11 +20,17 @@ class TrackingOrderMaps extends StatefulWidget {
 
 class TrackingOrderMapsState extends State<TrackingOrderMaps> {
   String? userUID;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
 
+    Future.delayed(Duration(seconds: 3), () {
+      setState(() {
+        isLoading = false;
+      });
+    });
     userUID = FirebaseAuth.instance.currentUser?.uid;
     print("✅ User uid: $userUID");
   }
@@ -33,42 +39,43 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
   Widget build(BuildContext context) {
     return BlocBuilder<TrackingOrderMapLogic, TrackingOrderMapState>(
       builder: (context, state) {
-        print("///////////////////////////////////// $state");
         final objTracking = context.watch<TrackingOrderMapLogic>();
-        return Scaffold(
-          body: Stack(
-            children: [
-              GoogleMap(
-                initialCameraPosition: CameraPosition(
-                  target: objTracking.userPosition != null
-                      ? LatLng(
-                          objTracking.userPosition!.latitude,
-                          objTracking.userPosition!.longitude,
-                        )
-                      : const LatLng(30.05, 31.31),
-                  zoom: 17.5,
+        return isLoading
+            ? Center(child: CircularProgressIndicator(color: AppColors.primary))
+            : Scaffold(
+                body: Stack(
+                  children: [
+                    GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: objTracking.userPosition != null
+                            ? LatLng(
+                                objTracking.userPosition!.latitude,
+                                objTracking.userPosition!.longitude,
+                              )
+                            : const LatLng(30.05, 31.31),
+                        zoom: 17.5,
+                      ),
+                      markers: objTracking.driverMarkers,
+                      polylines: {
+                        Polyline(
+                          polylineId: PolylineId("Saree3 App 🏍️"),
+                          points: objTracking.polyPoints,
+                          width: 4,
+                          color: Colors.red,
+                        ),
+                      },
+                      myLocationEnabled: objTracking.userPosition != null,
+                      myLocationButtonEnabled: false,
+                      onMapCreated: (controller) {
+                        context.read<TrackingOrderMapLogic>().setMapController(
+                          controller,
+                        );
+                      },
+                    ),
+                    _customBottomSheet(objTracking: objTracking),
+                  ],
                 ),
-                markers: objTracking.driverMarkers,
-                polylines: {
-                  Polyline(
-                    polylineId: PolylineId("Saree3 App 🏍️"),
-                    points: objTracking.polyPoints,
-                    width: 4,
-                    color: Colors.red,
-                  ),
-                },
-                myLocationEnabled: objTracking.userPosition != null,
-                myLocationButtonEnabled: false,
-                onMapCreated: (controller) {
-                  context.read<TrackingOrderMapLogic>().setMapController(
-                    controller,
-                  );
-                },
-              ),
-              _customBottomSheet(objTracking: objTracking),
-            ],
-          ),
-        );
+              );
       },
     );
   }
@@ -197,19 +204,19 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Robert F.",
+                        objTracking.driverName!,
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        "Courier",
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: AppColors.grey,
-                        ),
-                      ),
+                      // Text(
+                      //   "Courier",
+                      //   style: TextStyle(
+                      //     fontSize: 12.sp,
+                      //     color: AppColors.grey,
+                      //   ),
+                      // ),
                     ],
                   ),
                   Spacer(),
@@ -217,7 +224,7 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
                     backgroundColor: AppColors.primary,
                     child: IconButton(
                       onPressed: () {
-                        _makePhoneCall(phoneNumber: "01271134724");
+                        _makePhoneCall(phoneNumber: objTracking.driverPhone!);
                       },
                       icon: Icon(Icons.call, color: AppColors.white),
                     ),

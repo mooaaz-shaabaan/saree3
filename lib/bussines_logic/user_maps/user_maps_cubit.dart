@@ -76,7 +76,7 @@ class UserMapsLogic extends Cubit<UserMapsStatee> {
 
   // دالة تجيب لوكيشن اليوزر
   Future<void> _initLocation() async {
-    await _checkLocationPermission();
+    await checkLocationPermission();
 
     userPosition = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
@@ -104,32 +104,34 @@ class UserMapsLogic extends Cubit<UserMapsStatee> {
   }
 
   // دالة تعمل check على صلاحيه الموقع والموقع فى الجهاز شغال ولا لا
-  Future<bool> _checkLocationPermission() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      emit(ErrorState("خدمة الموقع مش شغالة"));
-      return false;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        emit(ErrorState("اليوزر رفض الصلاحية"));
-        return false;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      emit(ErrorState("الصلاحية مرفوضة بشكل دائم"));
-      return false;
-    }
-
-    // لو كل حاجة تمام
-    emit(CheckLocationPermission());
-    return true;
+  Future<bool> checkLocationPermission() async {
+  // 1️⃣ التأكد من تفعيل خدمة الموقع
+  if (!await Geolocator.isLocationServiceEnabled()) {
+    emit(ErrorState("خدمة الموقع مش شغالة"));
+    return false;
   }
+
+  // 2️⃣ التحقق من صلاحية الوصول للموقع
+  LocationPermission permission = await Geolocator.checkPermission();
+
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      emit(ErrorState("اليوزر رفض صلاحية الموقع"));
+      return false;
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    emit(ErrorState("الصلاحية مرفوضة بشكل دائم"));
+    return false;
+  }
+
+  // ✅ لو كل حاجة تمام
+  emit(CheckLocationPermission());
+  return true;
+}
+
 
   void _listenToDrivers() {
     FirebaseDatabase.instance.ref("drivers").onValue.listen((event) async {
@@ -171,9 +173,7 @@ class UserMapsLogic extends Cubit<UserMapsStatee> {
         if (response.routes.isNotEmpty) {
           final route = response.routes.first;
           double distance = route.distanceKm ?? 999;
-          print(
-            "////////////////////////////////////////////////////// $distance",
-          );
+         
 
           if (distance <= 5) {
             newMarkers.add(

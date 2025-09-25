@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:saree3/bussines_logic/user_maps/user_maps_cubit.dart';
 
 import '../../../bussines_logic/data_user/data_user_cubit.dart';
 import '../../widgets/home Widgets/home_greeting.dart';
@@ -14,7 +15,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     context.watch<DataUserLogic>().getData;
-
+    context.read<UserMapsLogic>().checkLocationPermission;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => FocusScope.of(context).unfocus(),
@@ -30,8 +31,6 @@ class HomePage extends StatelessWidget {
                 Gap(20.h),
                 homeSearchBar(context: context),
                 Gap(30.h),
-                // HomeCategories(),
-                // Gap(30.h),
                 homeRestaurants(),
               ],
             ),

@@ -24,28 +24,31 @@ class MapsOrderLogic extends Cubit<MapsOrderState> {
     final ref = FirebaseDatabase.instance.ref("orders");
     String userUID = FirebaseAuth.instance.currentUser!.uid;
 
-    // _subscription =
     ref.onValue.listen(
       (event) {
         try {
-          isLoading = false;
+          isLoading = false; 
           error = null;
 
           if (event.snapshot.value == null) {
             currentOrder = null;
-            emit(ListenToOrders()); // اعمل emit حتى لو مفيش داتا
-
+            emit(ListenToOrders());
             return;
           }
 
-          final data = event.snapshot.value as Map<dynamic, dynamic>;
+          final rawData = event.snapshot.value as Map<dynamic, dynamic>;
           DriverModel? userOrder;
 
-          for (var entry in data.entries) {
-            final model = DriverModel.fromMap(entry.value);
+          for (var entry in rawData.entries) {
+            // حول كل key لـ String
+            final safeMap = (entry.value as Map<dynamic, dynamic>).map(
+              (key, value) => MapEntry(key.toString(), value),
+            );
+
+            final model = DriverModel.fromMap(safeMap);
             if (model.userUID == userUID) {
               userOrder = model;
-              break; // ✅ اخرج من الـ loop لما تلاقي المطلوب
+              break;
             }
           }
 
@@ -54,12 +57,14 @@ class MapsOrderLogic extends Cubit<MapsOrderState> {
         } catch (e) {
           isLoading = false;
           error = e.toString();
+          print(e);
           emit(ErrorState());
         }
       },
       onError: (error) {
         isLoading = false;
         this.error = error.toString();
+        emit(ErrorState());
       },
     );
   }

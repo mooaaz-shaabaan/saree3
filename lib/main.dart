@@ -1,12 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:saree3/bottom_bar.dart';
+import 'package:saree3/presentation/screens/splash_screen/splash_screen.dart';
 import 'constants/providers.dart';
 import 'firebase_options.dart';
-import 'presentation/screens/auth/login.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +26,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool checkLogin = FirebaseAuth.instance.currentUser != null;
     return ScreenUtilInit( 
       designSize: const Size(392, 872),
       minTextAdapt: true,
@@ -44,7 +41,7 @@ class MyApp extends StatelessWidget {
           home: child,
         );
       },
-      child: checkLogin ? BottomBar() : LoginPage(),
+      child: SplashScreen(),
     );
   }
 }

@@ -10,6 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../constants/constants.dart';
+import '../../model/cart_item.dart';
 import '../../model/driverModel.dart';
 
 part 'tracking_order_map_state.dart';
@@ -21,13 +22,18 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
     _initLocation();
   }
 
+  double? latitudeDriver;
+  double? longtudeDriver;
+  List<CartItem>? cartItems;
+  String? statusOrder;
+  String? driverName;
+  String? driverPhone;
+
   final Set<Marker> driverMarkers = {};
   BitmapDescriptor? driverIcon;
   Position? userPosition;
   StreamSubscription<Position>? positionStream;
   String? useruid;
-  double? latitudeDriver;
-  double? longtudeDriver;
   String etaText = ''; // الوقت كنص جاهز للعرض
   double? routeKm; // المسافة بالكيلومتر
   List<LatLng> polyPoints = [];
@@ -51,7 +57,7 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
       (_mapController).setMapStyle(style);
       emit(LoadMapStyle());
     } catch (e) {
-      emit(ErrorState("Failed to load map style: $e"));
+      emit(ErrrorState("Failed to load map style: $e"));
     }
   }
 
@@ -82,8 +88,12 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
         final model = DriverModel.fromMap(value);
 
         if (model.userUID == userUID) {
-          latitudeDriver = model.lat;
-          longtudeDriver = model.lng;
+          latitudeDriver = model.lat ?? 0;
+          longtudeDriver = model.lng ?? 0;
+          driverName = model.driverName ?? "";
+          driverPhone = model.driverPhone ?? "";
+          statusOrder = model.statusOrder ?? "";
+          cartItems = model.cartItems ?? [];
 
           driverMarkers.add(
             Marker(
@@ -171,7 +181,7 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
       emit(GetPolyPoints());
     } catch (e) {
       print("ERROR V2 POLYLINE => $e");
-      emit(ErrorState("Failed to get polyline: $e"));
+      emit(ErrrorState("Failed to get polyline: $e"));
     }
   }
 
