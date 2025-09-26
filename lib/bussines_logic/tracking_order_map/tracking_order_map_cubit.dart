@@ -25,9 +25,7 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
   double? latitudeDriver;
   double? longtudeDriver;
   List<CartItem>? cartItems;
-  String? statusOrder;
-  String? driverName;
-  String? driverPhone;
+  String? statusOrder, driverName, driverPhone, totalPrice;
 
   final Set<Marker> driverMarkers = {};
   BitmapDescriptor? driverIcon;
@@ -88,12 +86,13 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
         final model = DriverModel.fromMap(value);
 
         if (model.userUID == userUID) {
-          latitudeDriver = model.lat ?? 0;
-          longtudeDriver = model.lng ?? 0;
-          driverName = model.driverName ?? "";
-          driverPhone = model.driverPhone ?? "";
-          statusOrder = model.statusOrder ?? "";
-          cartItems = model.cartItems ?? [];
+          latitudeDriver = model.lat;
+          longtudeDriver = model.lng;
+          driverName = model.driverName;
+          driverPhone = model.driverPhone;
+          statusOrder = model.statusOrder;
+          cartItems = model.cartItems;
+          totalPrice = model.totalPrice;
 
           driverMarkers.add(
             Marker(
@@ -151,8 +150,11 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
     try {
       final response = await polylinePoints.getRouteBetweenCoordinatesV2(
         request: RoutesApiRequest(
-          origin: PointLatLng(userPosition!.latitude, userPosition!.longitude),
-          destination: PointLatLng(latitudeDriver!, longtudeDriver!),
+          origin: PointLatLng(latitudeDriver!, longtudeDriver!),
+          destination: PointLatLng(
+            userPosition!.latitude,
+            userPosition!.longitude,
+          ),
           travelMode: TravelMode.driving,
           routingPreference: RoutingPreference.trafficAware,
           units: Units.metric,

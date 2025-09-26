@@ -182,7 +182,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   hintText: '********',
                                   validator: (v) {
                                     if (v == null || v.isEmpty) {
-                                      return "Please Enter Password";
+                                      return "Please Enter confirm Password";
                                     }
                                     if (v.length < 8) {
                                       return "Please enter at least 8 characters";

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:saree3/bottom_bar.dart';
 import 'package:saree3/bussines_logic/address/address_cubit.dart';
 import 'package:saree3/bussines_logic/address/address_state.dart';
 import 'package:saree3/presentation/screens/profile/address/add_address.dart';
@@ -251,11 +252,21 @@ class CartPage extends StatelessWidget {
   }
 
   void _placeOrder(BuildContext context) {
-    AwesomeDialog(
+    AwesomeDialog dialog = AwesomeDialog(
       context: context,
       dialogType: DialogType.success,
       animType: AnimType.bottomSlide,
       title: "Done",
-    ).show();
+    );
+
+    dialog.show();
+
+    Future.delayed(Duration(seconds: 2), () {
+      dialog.dismiss();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (c) => BottomBar(currentIndex: 2)),
+      );
+    });
   }
 }

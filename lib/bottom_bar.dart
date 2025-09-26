@@ -7,7 +7,8 @@ import 'package:saree3/presentation/screens/maps/maps_order.dart';
 import 'package:saree3/presentation/screens/profile/profile_page.dart';
 
 class BottomBar extends StatefulWidget {
-  const BottomBar({super.key});
+  const BottomBar({super.key, this.currentIndex = 0});
+  final int currentIndex;
 
   @override
   _BottomBarState createState() => _BottomBarState();

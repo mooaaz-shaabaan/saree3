@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:saree3/bottom_bar.dart';
 import 'package:saree3/bussines_logic/auth/auth_state.dart';
+import 'package:saree3/constants/constants.dart';
 import 'package:saree3/presentation/screens/auth/login.dart';
 
 class AuthLogic extends Cubit<AuthState> {
@@ -14,8 +15,6 @@ class AuthLogic extends Cubit<AuthState> {
     required String email,
     required String password,
     required String name,
-    String image =
-        "https://firebasestorage.googleapis.com/v0/b/saree3-6a6dc.firebasestorage.app/o/Profile%20User%2FMoaz%20B-Badla.jpg?alt=media&token=08dcf6fd-79ca-4739-8984-0cebd115a583", // خليها ثابت في constants.dart
     required BuildContext context,
   }) async {
     emit(SignupLoading());
@@ -29,36 +28,40 @@ class AuthLogic extends Cubit<AuthState> {
           .set({
             'uid': userCred.user!.uid,
             'email': email,
-            'name': name,
-            'image': image,
+            'full_name': name,
+            'phone_number': "16757", // يفضل تكون في constants.dart
+            'bio': "I love saree3 app", // برضه يفضل تبقى constant
+            'image': Images.firstImageProfile,
             'createdAt': FieldValue.serverTimestamp(),
           });
+
+      if (!context.mounted) return;
 
       AwesomeDialog(
         context: context,
         dialogType: DialogType.success,
         animType: AnimType.bottomSlide,
-        title: "تم تسجيل الحساب بنجاح",
-        btnOkOnPress: () {
-          logOut(context);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginPage()),
-          );
-        },
+        title: "Account created successfully",
       ).show();
+      Future.delayed(Duration(seconds: 3), () {
+        logOut(context);
+      });
 
       emit(SignupSuccess());
     } on FirebaseAuthException catch (e) {
       String message = _getAuthErrorMessage(e.code, fallback: e.message);
+
+      if (!context.mounted) return;
       AwesomeDialog(
         context: context,
         dialogType: DialogType.error,
         animType: AnimType.bottomSlide,
         title: message,
       ).show();
+
       emit(SignupFailure(message));
     } catch (e) {
+      if (!context.mounted) return;
       AwesomeDialog(
         context: context,
         dialogType: DialogType.error,
@@ -74,24 +77,20 @@ class AuthLogic extends Cubit<AuthState> {
     required String password,
     required BuildContext context,
   }) async {
-    emit(LoginLoading());
     try {
-      UserCredential userCred = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      String uid = userCred.user!.uid;
-
-      
-
+      if (!context.mounted) return;
 
       AwesomeDialog(
         context: context,
         dialogType: DialogType.success,
         animType: AnimType.bottomSlide,
-        title: "تم تسجيل الدخول الى حسابك بنجاح",
+        title: "Logged in successfully.",
       ).show();
-
-      emit(LoginSuccess(uid));
 
       await Future.delayed(const Duration(seconds: 2));
 
@@ -99,35 +98,34 @@ class AuthLogic extends Cubit<AuthState> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const BottomBar()),
+        MaterialPageRoute(builder: (_) => BottomBar()),
       );
     } on FirebaseAuthException catch (e) {
       String message = _getAuthErrorMessage(e.code, fallback: e.message);
 
+      if (!context.mounted) return;
       AwesomeDialog(
         context: context,
         dialogType: DialogType.error,
         animType: AnimType.bottomSlide,
         title: message,
       ).show();
-
-      emit(LoginFailure(message));
     } catch (e) {
+      if (!context.mounted) return;
       AwesomeDialog(
         context: context,
         dialogType: DialogType.error,
         animType: AnimType.bottomSlide,
-        title: "$e",
+        title: "Unexpected error: $e",
       ).show();
-
-      emit(LoginFailure(e.toString()));
     }
   }
 
   Future<void> logOut(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
 
-    // بعد ما يخلص تسجيل الخروج → يرجع على صفحة Login
+    if (!context.mounted) return;
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -135,34 +133,33 @@ class AuthLogic extends Cubit<AuthState> {
     emit(LogoutSuccess());
   }
 
-  // جوه class AuthLogic
   String _getAuthErrorMessage(String code, {String? fallback}) {
     switch (code) {
       case 'email-already-in-use':
-        return "الإيميل ده مستخدم بالفعل.";
+        return "This email is already in use.";
       case 'invalid-email':
-        return "الإيميل اللي دخلته غير صالح.";
+        return "The email you entered is not valid.";
       case 'operation-not-allowed':
-        return "التسجيل بالباسورد مش مفعّل، تواصل مع الدعم.";
+        return "Password sign-up is not enabled. Please contact support.";
       case 'weak-password':
-        return "الباسورد ضعيف جدًا، جرب حاجة أقوى.";
+        return "The password is too weak. Please choose a stronger one.";
       case 'too-many-requests':
-        return "محاولات كتير في وقت قصير! استنى شوية وحاول تاني.";
+        return "Too many attempts in a short time! Please wait and try again.";
       case 'user-token-expired':
-        return "انتهت صلاحية الجلسة، سجل دخول من جديد.";
+        return "Your session has expired. Please sign in again.";
       case 'network-request-failed':
-        return "مفيش اتصال بالإنترنت. اتأكد من الشبكة.";
+        return "No internet connection. Please check your network.";
       case 'user-disabled':
-        return "الحساب ده متعطل، تواصل مع الدعم.";
+        return "This account has been disabled. Please contact support.";
       case 'user-not-found':
-        return "مفيش حساب مسجل بالإيميل ده.";
+        return "No account found with this email.";
       case 'wrong-password':
-        return "الباسورد غلط، حاول تاني.";
+        return "Incorrect password. Please try again.";
       case 'invalid-credential':
       case 'INVALID_LOGIN_CREDENTIALS':
-        return "بيانات الدخول غير صحيحة.";
+        return "Invalid login credentials.";
       default:
-        return fallback ?? "حصل خطأ غير متوقع.";
+        return fallback ?? "An unexpected error occurred.";
     }
   }
 }

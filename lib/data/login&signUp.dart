@@ -10,7 +10,6 @@ Future<void> signUp({
   required String email,
   required String password,
   required String name,
-  String image = Images.firstImageProfile,
   required BuildContext context,
 }) async {
   try {
@@ -25,8 +24,8 @@ Future<void> signUp({
           'email': email,
           'full_name': name,
           'phone_number': "16757",
-          'bio': "I love fast food",
-          'image': image,
+          'bio': "I love saree3 app",
+          'image': Images.firstImageProfile,
           'createdAt': FieldValue.serverTimestamp(),
         });
 

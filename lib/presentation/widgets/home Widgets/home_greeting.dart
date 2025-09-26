@@ -16,11 +16,27 @@ Widget homeGreeting({required BuildContext context}) {
       return Row(
         spacing: 15.w,
         children: [
-          CircleAvatar(
-            radius: 25.r,
-            backgroundColor: AppColors.primary,
-            backgroundImage: NetworkImage(data.image),
+          // CircleAvatar(
+          //   radius: 25.r,
+          //   backgroundColor: AppColors.primary,
+          //   backgroundImage: NetworkImage(data.image),
+          // ),
+          ClipOval(
+            child: Image.network(
+              data.image,
+              height: 50,
+              width: 50,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return CircleAvatar(
+                  radius: 25.r,
+                  backgroundColor: AppColors.primary,
+                  child: Icon(Icons.person, size: 25, color: Colors.white),
+                );
+              },
+            ),
           ),
+
           Text(
             'Hey $firstName, Good Afternoon!',
             style: TextStyle(

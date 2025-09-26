@@ -20,13 +20,13 @@ class TrackingOrderMaps extends StatefulWidget {
 
 class TrackingOrderMapsState extends State<TrackingOrderMaps> {
   String? userUID;
-  bool isLoading = true;
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
 
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(Duration(seconds: 2), () {
       setState(() {
         isLoading = false;
       });
@@ -39,7 +39,7 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
   Widget build(BuildContext context) {
     return BlocBuilder<TrackingOrderMapLogic, TrackingOrderMapState>(
       builder: (context, state) {
-        final objTracking = context.watch<TrackingOrderMapLogic>();
+        final objTracking = context.read<TrackingOrderMapLogic>();
         return isLoading
             ? Center(child: CircularProgressIndicator(color: AppColors.primary))
             : Scaffold(
@@ -83,8 +83,8 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
   Widget _customBottomSheet({required TrackingOrderMapLogic objTracking}) {
     return DraggableScrollableSheet(
       initialChildSize: 0.25,
-      minChildSize: 0.25,
-      maxChildSize: 0.75,
+      minChildSize: 0.1,
+      maxChildSize: 0.7,
       builder: (context, controller) {
         return Container(
           decoration: BoxDecoration(
@@ -110,7 +110,6 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
               ),
               Gap(20.h),
 
-              // بيانات المطعم
               Row(
                 children: [
                   ClipRRect(
@@ -119,7 +118,10 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
                       width: 70.h,
                       height: 70.w,
                       color: Colors.grey.shade300,
-                      child: Icon(Icons.restaurant, color: Colors.grey),
+                      child: Image.network(
+                        objTracking.cartItems![0].imageResturant,
+                        fit: BoxFit.fill,
+                      ),
                     ),
                   ),
                   Gap(15.w),
@@ -127,28 +129,34 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Uttora Coffee House",
+                        "Abo Tark",
+                        // objTracking.cartItems![0].restaurantName,
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        "Ordered At 06 Sept, 10:00pm",
+                        "1500 EGP",
+                        // objTracking.totalPrice,
                         style: TextStyle(fontSize: 12.sp, color: Colors.grey),
                       ),
                     ],
                   ),
+                  Spacer(),
+                  TextButton(
+                    onPressed: () {
+                      _showDetalseDialog(
+                        context: context,
+                        objTracking: objTracking,
+                      );
+                    },
+                    child: Text(
+                      "Show Details Order..!",
+                      style: TextStyle(color: AppColors.primary),
+                    ),
+                  ),
                 ],
-              ),
-
-              // Gap(15.h),
-              Padding(
-                padding: EdgeInsets.only(left: 85.w),
-                child: Text(
-                  "2x Burger\n4x Sandwich",
-                  style: TextStyle(fontSize: 14.sp, color: Colors.grey[800]),
-                ),
               ),
 
               Gap(25.h),
@@ -165,7 +173,6 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
 
               Gap(25.h),
 
-              // الـ progress steps
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -190,52 +197,70 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
 
               Gap(50.h),
 
-              // بيانات الكابتن
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 25,
-                    backgroundImage: NetworkImage(
-                      "https://firebasestorage.googleapis.com/v0/b/saree3-6a6dc.firebasestorage.app/o/Profile%20User%2FMoaz%20B-Badla.jpg?alt=media&token=08dcf6fd-79ca-4739-8984-0cebd115a583",
-                    ), // صورة افتراضية
+              if (objTracking.driverName != null &&
+                  objTracking.driverPhone != null) ...[
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 25,
+                      backgroundImage: NetworkImage(Images.firstImageProfile),
+                    ),
+                    Gap(15.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          objTracking.driverName ?? "Delivery Captain",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Spacer(),
+                    CircleAvatar(
+                      backgroundColor: AppColors.primary,
+                      child: IconButton(
+                        onPressed: () {
+                          if (objTracking.driverPhone != null) {
+                            _makePhoneCall(
+                              phoneNumber: objTracking.driverPhone!,
+                            );
+                          }
+                        },
+                        icon: Icon(Icons.call, color: AppColors.white),
+                      ),
+                    ),
+                    Gap(10.w),
+                    CircleAvatar(
+                      backgroundColor: AppColors.primary,
+                      child: Icon(Icons.message, color: AppColors.white),
+                    ),
+                  ],
+                ),
+              ] else ...[
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  Gap(15.w),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
+                      Icon(Icons.delivery_dining, color: Colors.grey),
+                      Gap(15.w),
                       Text(
-                        objTracking.driverName!,
+                        "Assigning the delivery captain... 🚴",
                         style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 14.sp,
+                          color: Colors.grey[600],
                         ),
                       ),
-                      // Text(
-                      //   "Courier",
-                      //   style: TextStyle(
-                      //     fontSize: 12.sp,
-                      //     color: AppColors.grey,
-                      //   ),
-                      // ),
                     ],
                   ),
-                  Spacer(),
-                  CircleAvatar(
-                    backgroundColor: AppColors.primary,
-                    child: IconButton(
-                      onPressed: () {
-                        _makePhoneCall(phoneNumber: objTracking.driverPhone!);
-                      },
-                      icon: Icon(Icons.call, color: AppColors.white),
-                    ),
-                  ),
-                  Gap(10.w),
-                  CircleAvatar(
-                    backgroundColor: AppColors.primary,
-                    child: Icon(Icons.message, color: AppColors.white),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ],
           ),
         );
@@ -252,6 +277,96 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
     }
   }
 
+  void _showDetalseDialog({
+    required BuildContext context,
+    required TrackingOrderMapLogic objTracking,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text("Order Items"),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: 500.h,
+            child: ListView.builder(
+              itemCount: objTracking.cartItems!.length,
+              itemBuilder: (context, index) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: objTracking.cartItems!.length,
+                      itemBuilder: (context, itemIndex) {
+                        final item = objTracking.cartItems![itemIndex];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 30),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  item.imageProdact,
+                                  height: 60,
+                                  width: 60,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Gap(12.w),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.name,
+                                      style: TextStyle(
+                                        fontSize: 15.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text("Quantity: ${item.quantity}"),
+                                    Text(
+                                      "${item.price} EGP",
+                                      style: const TextStyle(
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Spacer(),
+                              Text(
+                                item.restaurantNameDefault,
+                                style: TextStyle(
+                                  fontSize: 15.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildStep(String text, StepStatus status, bool isLast) {
     Color activeColor = Color(0xff8C0700);
     Color inactiveColor = Colors.grey.shade300;
@@ -259,10 +374,8 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
     Widget iconWidget;
 
     if (status == StepStatus.completed) {
-      // ✅ مكتمل
       iconWidget = Icon(Icons.check, size: 12.sp, color: Colors.white);
     } else if (status == StepStatus.inProgress) {
-      // ⏳ جاري التنفيذ → loader
       iconWidget = SizedBox(
         width: 9.w,
         height: 9.h,
@@ -272,7 +385,6 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
         ),
       );
     } else {
-      // ⭕ لسه ما اشتغلش
       iconWidget = Icon(Icons.circle, size: 8.sp, color: inactiveColor);
     }
 
@@ -281,7 +393,6 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
       children: [
         Column(
           children: [
-            // الأيقونة جوا الدايرة
             Container(
               padding: EdgeInsets.all(6),
               decoration: BoxDecoration(
@@ -295,7 +406,6 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
               child: iconWidget,
             ),
 
-            // الخط النازل (لو مش آخر واحد)
             if (!isLast)
               Container(
                 width: 2.w,
@@ -310,7 +420,6 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
         ),
         Gap(10.w),
 
-        // النص
         Expanded(
           child: Padding(
             padding: const EdgeInsets.only(top: 8),
@@ -334,39 +443,85 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
       ],
     );
   }
-}
-      
 
+  Widget buildStepNew({
+    required String text,
+    required TrackingOrderMapLogic objStatus,
+    required bool isLast,
+  }) {
+    Color activeColor = Color(0xff8C0700);
+    Color inactiveColor = Colors.grey.shade300;
 
+    Widget iconWidget;
 
+    if (objStatus.statusOrder == "completed") {
+      iconWidget = Icon(Icons.check, size: 12.sp, color: Colors.white);
+    } else if (objStatus.statusOrder == "inProgress") {
+      iconWidget = SizedBox(
+        width: 9.w,
+        height: 9.h,
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        ),
+      );
+    } else {
+      iconWidget = Icon(Icons.circle, size: 8.sp, color: inactiveColor);
+    }
 
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: objStatus.statusOrder == "inProgress"
+                    ? activeColor
+                    : (objStatus.statusOrder == "completed"
+                          ? activeColor
+                          : inactiveColor),
+              ),
+              child: iconWidget,
+            ),
 
-  /*
+            if (!isLast)
+              Container(
+                width: 2.w,
+                height: 40.h,
+                color:
+                    objStatus.statusOrder == "completed" ||
+                        objStatus.statusOrder == "inProgress"
+                    ? activeColor
+                    : inactiveColor,
+              ),
+          ],
+        ),
+        Gap(10.w),
 
-  Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      if (objTracking.etaText != null && objTracking.routeKm != null) ...[
-        Text(
-          "🚴‍♂️ السواق في الطريق",
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.bold,
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              text,
+              style: TextStyle(
+                color: objStatus.statusOrder == "inProgress"
+                    ? Colors.grey
+                    : (objStatus.statusOrder == "completed"
+                          ? Color(0xff8C0700)
+                          : Colors.grey),
+                fontWeight:
+                    objStatus.statusOrder == "inProgress" ||
+                        objStatus.statusOrder == "completed"
+                    ? FontWeight.w900
+                    : FontWeight.normal,
+              ),
+            ),
           ),
         ),
-        Gap(8.h),
-        Text(
-          "المسافة: ${objTracking.routeKm!.toStringAsFixed(1)} كم",
-          style: TextStyle(fontSize: 14.sp),
-        ),
-        Text(
-          "الوقت المتوقع: ${objTracking.etaText}",
-          style: TextStyle(fontSize: 14.sp, color: Colors.green),
-        ),
-      ] else ...[
-        Center(child: CircularProgressIndicator()),
       ],
-    ],
-  ),
-
-  */
+    );
+  }
+}

@@ -18,6 +18,7 @@ Widget customDropdown<T>({
       value: value,
       isExpanded: true,
       decoration: InputDecoration(
+        hintText: label,
         labelStyle: TextStyle(
           fontSize: 12.sp,
           fontWeight: FontWeight.bold,
