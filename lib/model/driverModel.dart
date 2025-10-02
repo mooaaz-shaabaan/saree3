@@ -1,12 +1,21 @@
 import 'package:saree3/model/cart_item.dart';
 
 class DriverModel {
-  final String driverName, driverPhone, userUID, statusOrder, totalPrice;
-  final double lat;
-  final double lng;
+  final String driverName,
+      driverPhone,
+      userUID,
+      statusOrder,
+      imageResturant,
+      resturantName,
+      totalPrice;
+  final double lat, lng, resturantlat, resturantlng;
   final List<CartItem> cartItems;
 
   DriverModel({
+    required this.resturantlat,
+    required this.resturantlng,
+    required this.resturantName,
+    required this.imageResturant,
     required this.totalPrice,
     required this.driverName,
     required this.driverPhone,
@@ -36,7 +45,11 @@ class DriverModel {
       driverPhone: safeMap['phone'] ?? "",
       cartItems: items,
       statusOrder: safeMap['status'] ?? "",
-      totalPrice: map['totalPrice'] ?? "",
+      totalPrice: safeMap['total'] ?? "",
+      imageResturant: safeMap['image'] ?? "",
+      resturantName: safeMap['namerestaurant'] ?? "",
+      resturantlat: safeMap['restaurant_lat'] ?? 0.0,
+      resturantlng: safeMap['restaurant_long'] ?? 0.0,
     );
   }
 }

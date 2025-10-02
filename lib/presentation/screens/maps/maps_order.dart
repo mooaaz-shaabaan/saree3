@@ -35,24 +35,13 @@ class MapsOrederState extends State<MapsOreder> {
   Widget build(BuildContext context) {
     return BlocBuilder<MapsOrderLogic, MapsOrderState>(
       builder: (context, state) {
-        print("??????????????????????????????????????????????? $state");
         final objMapsOrder = context.read<MapsOrderLogic>();
-        print(
-          "????????????????????***??????????????????????????? ${objMapsOrder.error}",
-        );
+
         if (state is ErrorState) {
           return Scaffold(
             body: Center(child: Text("Error: ${objMapsOrder.error}")),
           );
         }
-
-        // if (state is ListenToOrders) {
-        //   return Scaffold(
-        //     body: context.read<MapsOrderLogic>().currentOrder == null
-        //         ? const UserMaps()
-        //         : const TrackingOrderMaps(),
-        //   );
-        // }
 
         if (state is MapsOrderInitial) {
           return const Scaffold(

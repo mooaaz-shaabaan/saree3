@@ -32,7 +32,6 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
       });
     });
     userUID = FirebaseAuth.instance.currentUser?.uid;
-    print("✅ User uid: $userUID");
   }
 
   @override
@@ -46,6 +45,7 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
                 body: Stack(
                   children: [
                     GoogleMap(
+                      zoomControlsEnabled: false,
                       initialCameraPosition: CameraPosition(
                         target: objTracking.userPosition != null
                             ? LatLng(
@@ -83,7 +83,7 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
   Widget _customBottomSheet({required TrackingOrderMapLogic objTracking}) {
     return DraggableScrollableSheet(
       initialChildSize: 0.25,
-      minChildSize: 0.1,
+      minChildSize: 0.05,
       maxChildSize: 0.7,
       builder: (context, controller) {
         return Container(
@@ -109,96 +109,109 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
                 ),
               ),
               Gap(20.h),
-
-              Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      width: 70.h,
-                      height: 70.w,
-                      color: Colors.grey.shade300,
-                      child: Image.network(
-                        objTracking.cartItems![0].imageResturant,
-                        fit: BoxFit.fill,
-                      ),
-                    ),
-                  ),
-                  Gap(15.w),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Abo Tark",
-                        // objTracking.cartItems![0].restaurantName,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold,
+              if (objTracking.driverName != null &&
+                  objTracking.driverPhone != null &&
+                  objTracking.cartItems != null &&
+                  objTracking.imageResturant != null &&
+                  objTracking.totalPrice != null &&
+                  objTracking.resturantName != null) ...[
+                Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        width: 70.h,
+                        height: 70.w,
+                        color: Colors.grey.shade300,
+                        child: Image.network(
+                          objTracking.cartItems![0].imageResturant,
+                          fit: BoxFit.fill,
                         ),
                       ),
-                      Text(
-                        "1500 EGP",
-                        // objTracking.totalPrice,
-                        style: TextStyle(fontSize: 12.sp, color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                  Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      _showDetalseDialog(
-                        context: context,
-                        objTracking: objTracking,
-                      );
-                    },
-                    child: Text(
-                      "Show Details Order..!",
-                      style: TextStyle(color: AppColors.primary),
                     ),
+                    Gap(15.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          objTracking.resturantName ?? "Resturant Name",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "${objTracking.totalPrice ?? "0000"} EGP",
+                          // objTracking.totalPrice,
+                          style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    Spacer(),
+                    TextButton(
+                      onPressed: () {
+                        _showDetalseDialog(
+                          context: context,
+                          objTracking: objTracking,
+                        );
+                      },
+                      child: Text(
+                        "Show Details Order..!",
+                        style: TextStyle(color: AppColors.primary),
+                      ),
+                    ),
+                  ],
+                ),
+
+                Gap(25.h),
+                Text(
+                  objTracking.etaText ?? "Assigning the time 🕐",
+                  style: TextStyle(
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-              ),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  "ESTIMATED DELIVERY TIME",
+                  style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
 
-              Gap(25.h),
-              Text(
-                objTracking.etaText,
-                style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                "ESTIMATED DELIVERY TIME",
-                style: TextStyle(fontSize: 12.sp, color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
+                Gap(25.h),
 
-              Gap(25.h),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildStep(
+                      text: "On the Way to Restaurant",
+                      stepKey: "heading_to_restaurant",
+                      objStatus: objTracking,
+                      isLast: false,
+                    ),
+                    _buildStep(
+                      text: "Arrived at Restaurant",
+                      stepKey: "at_restaurant",
+                      objStatus: objTracking,
+                      isLast: false,
+                    ),
+                    _buildStep(
+                      text: "On the Way to Customer",
+                      stepKey: "heading_to_customer",
+                      objStatus: objTracking,
+                      isLast: false,
+                    ),
+                    _buildStep(
+                      text: "Order Completed",
+                      stepKey: "completed",
+                      objStatus: objTracking,
+                      isLast: true,
+                    ),
+                  ],
+                ),
 
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildStep(
-                    "Your order has been received",
-                    StepStatus.completed,
-                    false,
-                  ),
-                  _buildStep(
-                    "The restaurant is preparing your food",
-                    StepStatus.inProgress,
-                    false,
-                  ),
-                  _buildStep(
-                    "Your order has been picked up for delivery",
-                    StepStatus.pending,
-                    false,
-                  ),
-                  _buildStep("Order arriving soon!", StepStatus.pending, true),
-                ],
-              ),
+                Gap(50.h),
 
-              Gap(50.h),
-
-              if (objTracking.driverName != null &&
-                  objTracking.driverPhone != null) ...[
                 Row(
                   children: [
                     CircleAvatar(
@@ -240,24 +253,26 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
                   ],
                 ),
               ] else ...[
-                Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.delivery_dining, color: Colors.grey),
-                      Gap(15.w),
-                      Text(
-                        "Assigning the delivery captain... 🚴",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.grey[600],
+                Center(
+                  child: Container(
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.delivery_dining, color: Colors.grey),
+                        Gap(15.w),
+                        Text(
+                          "Assigning the delivery captain... 🚴",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: Colors.grey[600],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -367,7 +382,7 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
     );
   }
 
-  Widget _buildStep(String text, StepStatus status, bool isLast) {
+  /* Widget _builcdStep(String text, StepStatus status, bool isLast) {
     Color activeColor = Color(0xff8C0700);
     Color inactiveColor = Colors.grey.shade300;
 
@@ -444,7 +459,7 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
     );
   }
 
-  Widget buildStepNew({
+   Widget buildStepNew({
     required String text,
     required TrackingOrderMapLogic objStatus,
     required bool isLast,
@@ -523,5 +538,89 @@ class TrackingOrderMapsState extends State<TrackingOrderMaps> {
         ),
       ],
     );
+  }*/
+
+  Widget _buildStep({
+    required String text,
+    required String stepKey, // هنا بنبعت step زي heading_to_restaurant
+    required TrackingOrderMapLogic objStatus,
+    required bool isLast,
+  }) {
+    Color activeColor = const Color(0xff8C0700);
+    Color inactiveColor = Colors.grey.shade300;
+
+    bool isCompleted = _isStepCompleted(stepKey, objStatus.statusOrder!);
+    bool isCurrent = objStatus.statusOrder == stepKey;
+
+    Widget iconWidget;
+    if (isCompleted) {
+      iconWidget = Icon(Icons.check, size: 12.sp, color: Colors.white);
+    } else if (isCurrent) {
+      iconWidget = SizedBox(
+        width: 9.w,
+        height: 9.h,
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        ),
+      );
+    } else {
+      iconWidget = Icon(Icons.circle, size: 8.sp, color: inactiveColor);
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isCurrent || isCompleted ? activeColor : inactiveColor,
+              ),
+              child: iconWidget,
+            ),
+            if (!isLast)
+              Container(
+                width: 2.w,
+                height: 40.h,
+                color: isCompleted || isCurrent ? activeColor : inactiveColor,
+              ),
+          ],
+        ),
+        Gap(10.w),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              text,
+              style: TextStyle(
+                color: isCurrent
+                    ? Colors.grey
+                    : (isCompleted ? activeColor : Colors.grey),
+                fontWeight: isCurrent || isCompleted
+                    ? FontWeight.w900
+                    : FontWeight.normal,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  bool _isStepCompleted(String stepKey, String currentStatus) {
+    const order = [
+      "heading_to_restaurant",
+      "at_restaurant",
+      "heading_to_customer",
+      "completed",
+    ];
+
+    int stepIndex = order.indexOf(stepKey);
+    int currentIndex = order.indexOf(currentStatus);
+
+    return currentIndex > stepIndex;
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:saree3/bussines_logic/auth/auth_logic.dart';
 import 'package:saree3/bussines_logic/maps_order/maps_order_cubit.dart';
+import 'package:saree3/bussines_logic/serach/search_cubit.dart';
 import 'package:saree3/bussines_logic/tracking_order_map/tracking_order_map_cubit.dart';
 import 'package:saree3/bussines_logic/user_maps/user_maps_cubit.dart';
 
@@ -21,6 +22,7 @@ class AppProviders {
     BlocProvider<SignUpLogic>(create: (_) => SignUpLogic()),
     BlocProvider<VerifyLogic>(create: (_) => VerifyLogic()),
     BlocProvider<AuthLogic>(create: (_) => AuthLogic()),
+    BlocProvider<SearchLogic>(create: (_) => SearchLogic()),
     BlocProvider<DataUserLogic>(
       create: (_) {
         final cubit = DataUserLogic();

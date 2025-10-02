@@ -67,7 +67,7 @@ class UserMapsLogic extends Cubit<UserMapsStatee> {
   Future<BitmapDescriptor> _loadIcon() async {
     final icon = await BitmapDescriptor.asset(
       ImageConfiguration(size: Size(50, 50)),
-      Images.iconDriver,
+      "assets/images/motorcycle.png",
     );
     driverIcon = icon;
     emit(LoadIcon());
@@ -105,33 +105,32 @@ class UserMapsLogic extends Cubit<UserMapsStatee> {
 
   // دالة تعمل check على صلاحيه الموقع والموقع فى الجهاز شغال ولا لا
   Future<bool> checkLocationPermission() async {
-  // 1️⃣ التأكد من تفعيل خدمة الموقع
-  if (!await Geolocator.isLocationServiceEnabled()) {
-    emit(ErrorState("خدمة الموقع مش شغالة"));
-    return false;
-  }
-
-  // 2️⃣ التحقق من صلاحية الوصول للموقع
-  LocationPermission permission = await Geolocator.checkPermission();
-
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      emit(ErrorState("اليوزر رفض صلاحية الموقع"));
+    // 1️⃣ التأكد من تفعيل خدمة الموقع
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      emit(ErrorState("خدمة الموقع مش شغالة"));
       return false;
     }
+
+    // 2️⃣ التحقق من صلاحية الوصول للموقع
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        emit(ErrorState("اليوزر رفض صلاحية الموقع"));
+        return false;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      emit(ErrorState("الصلاحية مرفوضة بشكل دائم"));
+      return false;
+    }
+
+
+    emit(CheckLocationPermission());
+    return true;
   }
-
-  if (permission == LocationPermission.deniedForever) {
-    emit(ErrorState("الصلاحية مرفوضة بشكل دائم"));
-    return false;
-  }
-
-  // ✅ لو كل حاجة تمام
-  emit(CheckLocationPermission());
-  return true;
-}
-
 
   void _listenToDrivers() {
     FirebaseDatabase.instance.ref("drivers").onValue.listen((event) async {
@@ -149,45 +148,59 @@ class UserMapsLogic extends Cubit<UserMapsStatee> {
 
       for (var entry in data.entries) {
         final uid = entry.key;
-        final value = entry.value as Map;
-        final lat = (value["lat"] as num).toDouble();
-        final lng = (value["lng"] as num).toDouble();
-        final name = value['name'];
+        final value = entry.value as Map?;
+
+        if (value == null) continue;
+
+        final latValue = value["driver_lat"];
+        final lngValue = value["driver_long"];
+        final name = value['driver_name'] ?? "Driver Name";
+
+        if (latValue == null || lngValue == null) {
+          continue;
+        }
+
+        final lat = (latValue as num).toDouble();
+        final lng = (lngValue as num).toDouble();
 
         updatedLocations[uid] = LatLng(lat, lng);
 
-        // هنا تحسب المسافة
-        final response = await polylinePoints.getRouteBetweenCoordinatesV2(
-          request: RoutesApiRequest(
-            origin: PointLatLng(
-              userPosition!.latitude,
-              userPosition!.longitude,
-            ),
-            destination: PointLatLng(lat, lng),
-            travelMode: TravelMode.driving,
-            routingPreference: RoutingPreference.trafficAware,
-            units: Units.metric,
-          ),
-        );
-
-        if (response.routes.isNotEmpty) {
-          final route = response.routes.first;
-          double distance = route.distanceKm ?? 999;
-         
-
-          if (distance <= 5) {
-            newMarkers.add(
-              Marker(
-                markerId: MarkerId(uid),
-                position: LatLng(lat, lng),
-                icon: driverIcon ?? BitmapDescriptor.defaultMarker,
-                infoWindow: InfoWindow(title: name),
-                onTap: () {
-                  print("Tapped on driver $uid");
-                },
+        try {
+          final response = await polylinePoints.getRouteBetweenCoordinatesV2(
+            request: RoutesApiRequest(
+              origin: PointLatLng(
+                userPosition!.latitude,
+                userPosition!.longitude,
               ),
-            );
+              destination: PointLatLng(lat, lng),
+              travelMode: TravelMode.driving,
+              routingPreference: RoutingPreference.trafficAware,
+              units: Units.metric,
+            ),
+          );
+
+          if (response.routes.isNotEmpty) {
+            final route = response.routes.first;
+            double distance = route.distanceKm ?? 999;
+
+            if (distance <= 5) {
+              newMarkers.add(
+                Marker(
+                  markerId: MarkerId(uid),
+                  position: LatLng(lat, lng),
+                  icon: driverIcon ?? BitmapDescriptor.defaultMarker,
+                  infoWindow: InfoWindow(
+                    title: name,
+                  ),
+                  onTap: () {
+                    print("Tapped on driver $uid");
+                  },
+                ),
+              );
+            }
           }
+        } catch (e) {
+          print("❌ Error while getting route for driver $uid: $e");
         }
       }
 

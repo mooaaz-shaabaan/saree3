@@ -22,18 +22,22 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
     _initLocation();
   }
 
-  double? latitudeDriver;
-  double? longtudeDriver;
+  double? latitudeDriver, longtudeDriver, resturantLat, resturantLng;
   List<CartItem>? cartItems;
-  String? statusOrder, driverName, driverPhone, totalPrice;
+  String? statusOrder,
+      driverName,
+      driverPhone,
+      totalPrice,
+      imageResturant,
+      resturantName;
 
   final Set<Marker> driverMarkers = {};
   BitmapDescriptor? driverIcon;
   Position? userPosition;
   StreamSubscription<Position>? positionStream;
   String? useruid;
-  String etaText = ''; // الوقت كنص جاهز للعرض
-  double? routeKm; // المسافة بالكيلومتر
+  String? etaText;
+  double? routeKm;
   List<LatLng> polyPoints = [];
   PolylinePoints polylinePoints = PolylinePoints(apiKey: googleAPIKey);
 
@@ -76,11 +80,11 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
     String userUID = FirebaseAuth.instance.currentUser!.uid;
 
     ref.onValue.listen((event) {
-      if (event.snapshot.value == null) return; // ✅ لازم الأول عشان مايكسرش
+      if (event.snapshot.value == null) return;
 
       final data = event.snapshot.value as Map<dynamic, dynamic>;
 
-      driverMarkers.clear(); // مسح الماركرات القديمة
+      driverMarkers.clear();
 
       data.forEach((key, value) {
         final model = DriverModel.fromMap(value);
@@ -93,6 +97,10 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
           statusOrder = model.statusOrder;
           cartItems = model.cartItems;
           totalPrice = model.totalPrice;
+          imageResturant = model.imageResturant;
+          resturantName = model.resturantName;
+          resturantLat = model.resturantlat;
+          resturantLng = model.resturantlng;
 
           driverMarkers.add(
             Marker(
@@ -126,15 +134,7 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
         ).listen((Position position) async {
           userPosition = position;
 
-          // 👈 الكاميرا تتحرك أول مرة بس
-          // if (!_movedOnce) {
-          //   _movedOnce = true;
-          //   _mapController.animateCamera(
-          //     CameraUpdate.newLatLng(
-          //       LatLng(position.latitude, position.longitude),
-          //     ),
-          //   );
-          // }
+
           fitCameraToBounds();
         });
 
@@ -143,7 +143,6 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
     emit(InitLocation());
   }
 
-  // دالة تظهر خط الرحلة
   Future<void> _getPolyPoints() async {
     if (userPosition == null) return;
 
@@ -161,40 +160,45 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
         ),
       );
 
-      if (response.routes.isNotEmpty) {
-        final route = response.routes.first;
+      if (response.routes.isEmpty) {
+        emit(ErrrorState("No routes found"));
+        return;
+      }
 
-        // نقاط الخط
+      final route = response.routes.first;
+
+      // حساب المسافة والوقت
+      routeKm =
+          (route.distanceKm ??
+          (route.distanceMeters != null
+              ? route.distanceMeters! / 1000.0
+              : null));
+
+      final mins = route.durationMinutes ?? route.staticDurationMinutes ?? 0;
+      etaText = _formatMinutes(mins);
+
+      if (statusOrder == "heading_to_restaurant" ||
+          statusOrder == "at_restaurant") {
+        polyPoints = [];
+      } else {
         polyPoints = (route.polylinePoints ?? [])
             .map((p) => LatLng(p.latitude, p.longitude))
             .toList();
-
-        // المسافة بالكيلومتر
-        routeKm =
-            (route.distanceKm ??
-            (route.distanceMeters != null
-                ? route.distanceMeters! / 1000.0
-                : null));
-
-        // الوقت بالدقائق (يفضل durationMinutes لو متاح، وإلا staticDurationMinutes)
-        final mins = route.durationMinutes ?? route.staticDurationMinutes ?? 0;
-        etaText = _formatMinutes(mins);
       }
+
       emit(GetPolyPoints());
     } catch (e) {
-      print("ERROR V2 POLYLINE => $e");
+      print("ERROR POLYLINE => $e");
       emit(ErrrorState("Failed to get polyline: $e"));
     }
   }
 
-  // دالة تحسب وقت الرحلة
   String _formatMinutes(double minutes) {
     final m = minutes.round();
     emit(FormatMinutes());
-    return "$m min";
+    return "$m Min";
   }
 
-  // الكاميرا تبقا مع السواق واليوزر
   Future<void> fitCameraToBounds() async {
     if (userPosition == null ||
         latitudeDriver == null ||
@@ -225,7 +229,7 @@ class TrackingOrderMapLogic extends Cubit<TrackingOrderMapState> {
       CameraUpdate.newLatLngBounds(
         bounds,
         100,
-      ), // padding = مسافة حوالين النقطتين
+      ),
     );
     emit(FitCameraToBounds());
   }

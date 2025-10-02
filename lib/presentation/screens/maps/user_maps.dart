@@ -2,12 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:gap/gap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:saree3/bussines_logic/user_maps/user_maps_cubit.dart';
 import 'package:saree3/bussines_logic/user_maps/user_maps_state.dart';
-
-enum StepStatus { completed, inProgress, pending }
 
 class UserMaps extends StatefulWidget {
   const UserMaps({super.key});
@@ -167,15 +164,4 @@ class UserMapsState extends State<UserMaps> {
   //   );
   // }
 }
-  // Future<void> _upTpFirestore() async {
-  //   await FirebaseFirestore.instance.collection('orders').add({
-  //     'userUID': userUID,
-  //     'userLat': _userPosition!.latitude,
-  //     'userLong': _userPosition!.longitude,
-  //     'location': "Cairo",
-  //     'restaurantName': "McDonald's",
-  //     'status': "pending",
-  //     'time': FieldValue.serverTimestamp(),
-  //   });
-  // }
-
+  
